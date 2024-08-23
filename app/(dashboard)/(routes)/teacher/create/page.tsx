@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { createCourse } from "../actions/create-actions";
 
 const formSchema = z.object({
     title: z.string().min(2, {
@@ -39,16 +40,28 @@ const CreatePage = () => {
 
     const { isSubmitting, isValid } = form.formState;
 
+    // const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    //     try {
+    //         const response = await axios.post("/api/courses", values);
+    //         //console.log(response);
+    //         router.push(`/teacher/courses/${response.data.id}`);
+    //         toast.success("Course created");
+    //     } catch {
+    //         toast.error("Something went wrong");
+    //     }
+    // };
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            const response = await axios.post("/api/courses", values);
-            //console.log(response);
-            router.push(`/teacher/courses/${response.data.id}`);
+            const response = await createCourse(values);
+            router.push(`/teacher/courses/${response?.success?.id}`);
+            //console.log("client side title", response);
             toast.success("Course created");
-        } catch {
+        } catch (error) {
             toast.error("Something went wrong");
         }
-    };
+    }
+
 
     return (
         <div className="max-w-5xl mx-auto mt-10 flex md:items-center md:justify-center h-full p-6 dark:bg-black">
