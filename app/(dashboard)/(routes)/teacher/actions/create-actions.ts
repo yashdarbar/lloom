@@ -2,12 +2,15 @@
 
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 
-type createCourseProps = {
-    title: string;
+type CourseProps = {
+    title?: string;
+    description?: string | null;
+    imageUrl?: string | null;
 };
 
-export async function createCourse(values: createCourseProps) {
+export async function createCourse(values: CourseProps) {
     try {
         const { userId } = auth();
         if (!userId || !values.title) {
@@ -18,6 +21,7 @@ export async function createCourse(values: createCourseProps) {
             data: {
                 userId,
                 title: values.title,
+                //description: values.description,
             },
         });
         //console.log("courseTititle" ,courseTitle);
@@ -48,14 +52,48 @@ export async function getCourse(courseId: string) {
                 id: courseId,
             },
         });
-
+        //revalidatePath(`/teacher/courses/${courseId}`);
         return {
             success: course,
         };
+
     } catch (error) {
         console.log("[GET_COURSE]", error);
         return {
             error: "GET_COURSE_ERROR",
+        };
+    }
+}
+
+export async function updateCourse(courseId: string, values: CourseProps) {
+    try {
+        const { userId } = auth();
+
+        if (!userId || !courseId) {
+            return {
+                error: "Unauthorized or missing course",
+            };
+        }
+
+        const updateCourse = await db.course.update({
+            where: {
+                id: courseId,
+                userId,
+            },
+            data: {
+                title: values.title,
+                description: values.description,
+                imageUrl: values.imageUrl,
+            },
+        });
+
+        return {
+            success: updateCourse,
+        };
+    } catch (error) {
+        console.log("[UPDATE_COURSE]", error);
+        return {
+            error: "UPDATE_COURSE_ERROR",
         };
     }
 }

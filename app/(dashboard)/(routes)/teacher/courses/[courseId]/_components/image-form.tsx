@@ -10,13 +10,16 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { Course } from "@/src/app/generated/client";
 import Image from "next/image";
 import { FileUpload } from "@/components/file-upload";
+import { updateCourse } from "../../../actions/create-actions";
 
 interface ImageFormProps {
-    initialData: Course;
-    courseId: string;
+    initialData: {
+            imageUrl?: string | null;
+            id?: string;
+        } | null | undefined;
+    courseId: string | undefined;
 }
 
 const formSchema = z.object({
@@ -34,12 +37,19 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
     const router = useRouter();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        //console.log(values);
         try {
-            await axios.patch(`/api/courses/${courseId}`, values);
-            toast.success("course updated successfully");
-            toggleEdit();
-            router.refresh();
+            if (!courseId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const imageUrl = await updateCourse(courseId, values);
+            if (imageUrl?.success) {
+                toast.success("Image updated successfully");
+            }else {
+                toast.error(imageUrl.error || "Image not updated");
+            }
         } catch (error) {
             toast.error("Something went wrong!");
         }
@@ -51,13 +61,13 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
                 Course image
                 <Button variant="ghost" onClick={toggleEdit}>
                     {isEditing && <>Cancel</>}
-                    {!isEditing && !initialData.imageUrl && (
+                    {!isEditing && !initialData?.imageUrl && (
                         <>
                             <PlusCircle className="h-4 w-4 mr-2" />
                             Add an image
                         </>
                     )}
-                    {!isEditing && initialData.imageUrl && (
+                    {!isEditing && initialData?.imageUrl && (
                         <>
                             <Pencil className="h-4 w-4 mr-2 " />
                             Edit image
@@ -66,7 +76,7 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
                 </Button>
             </div>
             {!isEditing &&
-                (!initialData.imageUrl ? (
+                (!initialData?.imageUrl ? (
                     <div className="h-60 flex items-center justify-center bg-slate-200 rounded-md dark:bg-gray-950">
                         <ImageIcon className="h-10 w-10 text-slate-500" />
                     </div>

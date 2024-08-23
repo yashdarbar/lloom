@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { updateCourse } from "../../../actions/create-actions";
+
 
 interface TitleFormProps {
     initialData: {
@@ -51,15 +53,19 @@ const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
     const router = useRouter();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        //console.log(values);
         try {
-            
-            // await axios.patch(`/api/courses/${courseId}`, values);
-            // //console.log("bruh",values);
-            // toast.success("course updated successfully");
-            // toggleEdit();
-            // router.refresh();
-            //eror
+            if (!courseId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const title = await updateCourse(courseId, values);
+            if (title?.success) {
+                toast.success("Course updated successfully")
+            } else {
+                toast.error(title?.error || "Something went wrong");
+            }
         } catch (error) {
             toast.error("Something went wrong!");
         }

@@ -19,12 +19,16 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
-import { Course } from "@/src/app/generated/client";
+import { updateCourse } from "../../../actions/create-actions";
 
 interface DescriptionFormProps {
-    initialData: Course;
-    courseId: string;
+    initialData: {
+            description?: string | null;
+            id?: string;
+        } | null | undefined;
+    courseId: string | undefined;
 }
+
 
 const formSchema = z.object({
     description: z.string().min(1, {
@@ -36,7 +40,7 @@ const DescriptionForm = ({ initialData, courseId }: DescriptionFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            description: initialData?.description || ""
+            description: initialData?.description || "",
         },
     });
 
@@ -49,12 +53,19 @@ const DescriptionForm = ({ initialData, courseId }: DescriptionFormProps) => {
     const router = useRouter();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        //console.log(values);
         try {
-            await axios.patch(`/api/courses/${courseId}`, values);
-            toast.success("course updated successfully");
-            toggleEdit();
-            router.refresh();
+            if (!courseId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const description = await updateCourse(courseId, values);
+            if (description?.success) {
+                toast.success("Course updated successfully");
+            } else {
+                toast.error(description?.error || "Course not updated");
+            }
         } catch (error) {
             toast.error("Something went wrong!");
         }
@@ -79,10 +90,10 @@ const DescriptionForm = ({ initialData, courseId }: DescriptionFormProps) => {
                 <p
                     className={cn(
                         "text-sm mt-2",
-                        !initialData.description && "text-slate-500 italic"
+                        !initialData?.description && "text-slate-500 italic"
                     )}
                 >
-                    {initialData.description || "No description"}
+                    {initialData?.description || "No description"}
                 </p>
             )}
             {isEditing && (

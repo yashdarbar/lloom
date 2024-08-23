@@ -65,13 +65,16 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                             <IconBagde icon={LayoutDashboard} />
                             <h2 className="text-xl">Customize your course</h2>
                         </div>
-                        <TitleForm initialData={course?.success} courseId={course?.success?.id} />
-                        {/* <DescriptionForm
-                            initialData={course}
-                            courseId={course.id}
+                        <TitleForm
+                            initialData={course?.success}
+                            courseId={course?.success?.id}
                         />
-                        <ImageForm initialData={course} courseId={course.id} />
-                        <CategoryForm
+                        <DescriptionForm
+                            initialData={course?.success}
+                            courseId={course?.success?.id}
+                        />
+                        <ImageForm initialData={course?.success} courseId={course?.success?.id} />
+                        {/*<CategoryForm
                             initialData={course}
                             courseId={course.id}
                             options={categories.map((category) => ({
