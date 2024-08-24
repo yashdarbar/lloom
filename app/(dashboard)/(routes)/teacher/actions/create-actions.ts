@@ -8,6 +8,7 @@ type CourseProps = {
     title?: string;
     description?: string | null;
     imageUrl?: string | null;
+    categoryId?: string | null;
 };
 
 export async function createCourse(values: CourseProps) {
@@ -56,7 +57,6 @@ export async function getCourse(courseId: string) {
         return {
             success: course,
         };
-
     } catch (error) {
         console.log("[GET_COURSE]", error);
         return {
@@ -84,6 +84,7 @@ export async function updateCourse(courseId: string, values: CourseProps) {
                 title: values.title,
                 description: values.description,
                 imageUrl: values.imageUrl,
+                categoryId: values.categoryId,
             },
         });
 
@@ -94,6 +95,24 @@ export async function updateCourse(courseId: string, values: CourseProps) {
         console.log("[UPDATE_COURSE]", error);
         return {
             error: "UPDATE_COURSE_ERROR",
+        };
+    }
+}
+
+export async function getCategory() {
+    try {
+        const category = await db.category.findMany({
+            orderBy: {
+                name: "asc",
+            },
+        });
+        return {
+            success: category,
+        };
+    } catch (error) {
+        console.log("[GET_CATEGORY]", error);
+        return {
+            error: "GET_CATEGORY_ERROR",
         };
     }
 }

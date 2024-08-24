@@ -15,10 +15,13 @@ import { FileUpload } from "@/components/file-upload";
 import { updateCourse } from "../../../actions/create-actions";
 
 interface ImageFormProps {
-    initialData: {
-            imageUrl?: string | null;
-            id?: string;
-        } | null | undefined;
+    initialData:
+        | {
+              imageUrl?: string | null;
+              id?: string;
+          }
+        | null
+        | undefined;
     courseId: string | undefined;
 }
 
@@ -29,7 +32,6 @@ const formSchema = z.object({
 });
 
 const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
-
     const [isEditing, setIsEditing] = useState(false);
 
     const toggleEdit = () => setIsEditing((current) => !current);
@@ -47,7 +49,7 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
             const imageUrl = await updateCourse(courseId, values);
             if (imageUrl?.success) {
                 toast.success("Image updated successfully");
-            }else {
+            } else {
                 toast.error(imageUrl.error || "Image not updated");
             }
         } catch (error) {
@@ -82,14 +84,26 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
                     </div>
                 ) : (
                     <div className="relative aspect-video mt-2">
-                        <Image src={initialData.imageUrl} fill={true} alt="Upload" className="object-cover rounded-md"/>
+                        <Image
+                            src={initialData.imageUrl}
+                            fill={true}
+                            alt="Upload"
+                            className="object-cover rounded-md"
+                        />
                     </div>
                 ))}
-            {isEditing && <div>
-                <FileUpload
-                endpoint="courseImage"
-                onChange={(url)=> {if (url) {onSubmit({imageUrl: url});}}}
-                /></div>}
+            {isEditing && (
+                <div>
+                    <FileUpload
+                        endpoint="courseImage"
+                        onChange={(url) => {
+                            if (url) {
+                                onSubmit({ imageUrl: url });
+                            }
+                        }}
+                    />
+                </div>
+            )}
         </div>
     );
 };

@@ -11,7 +11,7 @@ import PriceForm from "./_components/price-form";
 import AttachmentForm from "./_components/attachment-form";
 import ChapterForm from "./_components/chapter-form";
 import CourseActions from "./_components/course-actions";
-import { getCourse } from "../../actions/create-actions";
+import { getCategory, getCourse } from "../../actions/create-actions";
 //import Banner from "@/components/banner";
 
 const CourseId = async ({ params }: { params: { courseId: string } }) => {
@@ -22,6 +22,14 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
             error: "Course not found"
         };
     }
+    const categories = await getCategory();
+    console.log(categories);
+    if (!categories) {
+        return {
+            error: "Categories not found",
+        };
+    }
+
 
     const allTheFields = [
         course?.success?.title,
@@ -74,14 +82,14 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                             courseId={course?.success?.id}
                         />
                         <ImageForm initialData={course?.success} courseId={course?.success?.id} />
-                        {/*<CategoryForm
-                            initialData={course}
-                            courseId={course.id}
-                            options={categories.map((category) => ({
+                        <CategoryForm
+                            initialData={course?.success}
+                            courseId={course?.success?.id}
+                            options={categories?.success?.map((category) => ({
                                 label: category.name,
                                 value: category.id,
                             }))}
-                        /> */}
+                        />
                     </div>
                     {/* <div className="space-y-6">
                         <div>

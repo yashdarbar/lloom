@@ -18,15 +18,24 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Course } from "@/src/app/generated/client";
+//import { Course } from "@/src/app/generated/client";
 import { Combobox } from "@/components/ui/combobox";
+import { updateCourse } from "../../../actions/create-actions";
 
 interface CategoryFormProps {
-    initialData: Course;
-    courseId: string;
-    options: {label: string, value: string} [];
+    initialData:
+        | {
+              categoryId?: string | null;
+              id?: string;
+          }
+        | null
+        | undefined;
+    courseId: string | undefined;
+    options?: {
+        label: string | undefined;
+        value: string | undefined;
+    }[];
 }
-
 
 const formSchema = z.object({
     categoryId: z.string().min(1, {
@@ -34,11 +43,15 @@ const formSchema = z.object({
     }),
 });
 
-const CategoryForm = ({ initialData, courseId, options }: CategoryFormProps) => {
+const CategoryForm = ({
+    initialData,
+    courseId,
+    options,
+}: CategoryFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            categoryId: initialData?.categoryId || ""
+            categoryId: initialData?.categoryId || "",
         },
     });
 
@@ -51,19 +64,27 @@ const CategoryForm = ({ initialData, courseId, options }: CategoryFormProps) => 
     const router = useRouter();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        //console.log(values);
         try {
-            await axios.patch(`/api/courses/${courseId}`, values);
-            toast.success("course updated successfully");
-            toggleEdit();
-            router.refresh();
+            if (!courseId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const categoryId = await updateCourse(courseId, values);
+            if (categoryId?.success) {
+                toast.success("Course updated successfully");
+            } else {
+                toast.error(categoryId?.error || "Course not updated");
+            }
         } catch (error) {
             toast.error("Something went wrong!");
         }
     };
 
-    const selectedOption = options.find((option)=> option.value === initialData.categoryId);
-
+    const selectedOption = options?.find(
+        (option) => option.value === initialData?.categoryId
+    );
 
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4 dark:bg-black">
@@ -84,7 +105,7 @@ const CategoryForm = ({ initialData, courseId, options }: CategoryFormProps) => 
                 <p
                     className={cn(
                         "text-sm mt-2",
-                        !initialData.categoryId && "text-slate-500 italic"
+                        !initialData?.categoryId && "text-slate-500 italic"
                     )}
                 >
                     {selectedOption?.label || "No catergory"}
@@ -103,10 +124,10 @@ const CategoryForm = ({ initialData, courseId, options }: CategoryFormProps) => 
                                 <FormItem>
                                     <FormControl>
                                         <Combobox
-                                        options={options}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        // {...field}
+                                            options={options}
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            // {...field}
                                         />
                                     </FormControl>
                                     <FormMessage />
