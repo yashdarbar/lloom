@@ -9,35 +9,33 @@ import { Pencil } from "lucide-react";
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
-    FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Course } from "@prisma/client";
-import { Input } from "@/components/ui/input";
-import { formatPrice } from "@/lib/format";
-import { updateCourse } from "../../../actions/create-actions";
-import { CourseData } from "@/app/type/course";
+import { Chapter, Course } from "@/src/app/generated/client";;
+import { Checkbox } from "@/components/ui/checkbox";
 
-interface PriceFormProps {
-    initialData: CourseData;
-    courseId: string | undefined;
+interface ChapterAccessFormProps {
+    initialData: Chapter;
+    courseId: string;
+    chapterId: string;
 }
 
 const formSchema = z.object({
-    price: z.coerce.number(),
+    isFree: z.boolean().default(false),
 });
 
-const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
+const ChapterAccessForm = ({ initialData, courseId, chapterId }: ChapterAccessFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            price: initialData?.price || undefined,
+            isFree: !!initialData.isFree //double !! used to make it boolean
         },
     });
 
@@ -52,17 +50,10 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log(values);
         try {
-            if (!courseId) {
-                return {
-                    error: "Course not found",
-                };
-            }
-            const price = await updateCourse(courseId, {price: values.price});
-            if (price?.success) {
-                toast.success("Course updated successfully");
-            } else {
-                toast.error(price?.error || "Course not updated");
-            }
+            await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
+            toast.success("Chapter updated successfully");
+            toggleEdit();
+            router.refresh();
         } catch (error) {
             toast.error("Something went wrong!");
         }
@@ -71,14 +62,14 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4 dark:bg-black">
             <div className="font-medium flex items-center justify-between">
-                Course price
+                Chapter access
                 <Button variant="ghost" onClick={toggleEdit}>
                     {isEditing ? (
                         <>Cancel</>
                     ) : (
                         <>
                             <Pencil className="h-4 w-4 mr-2 " />
-                            Edit price
+                            Edit access
                         </>
                     )}
                 </Button>
@@ -87,10 +78,12 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
                 <p
                     className={cn(
                         "text-sm mt-2",
-                        !initialData.price && "text-slate-500 italic"
+                        !initialData.isFree && "text-slate-500 italic"
                     )}
                 >
-                    {initialData.price ? formatPrice(initialData.price) : "No price"}
+                    {initialData.isFree ? (
+                        <>This chapter is free for preview.</>
+                    ) : (<>This chapter is not free.</>)}
                 </p>
             )}
             {isEditing && (
@@ -101,19 +94,21 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
                     >
                         <FormField
                             control={form.control}
-                            name="price"
+                            name="isFree"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                     <FormControl>
-                                        <Input
-                                            type="number"
-                                            step={0.01}
-                                            disabled={isSubmitting}
-                                            placeholder="Set your course price"
-                                            {...field}
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
                                         />
                                     </FormControl>
-                                    <FormMessage />
+                                    <div className="leading-none">
+                                        <FormDescription>
+                                            Check this box if you want to make
+                                            this chapter as free for review.
+                                        </FormDescription>
+                                    </div>
                                 </FormItem>
                             )}
                         />
@@ -132,4 +127,4 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
     );
 };
 
-export default PriceForm;
+export default ChapterAccessForm;

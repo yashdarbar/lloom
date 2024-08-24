@@ -1,11 +1,6 @@
 "use client";
 
-import * as z from "zod";
-import axios from "axios";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Pencil } from "lucide-react";
-
+import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
@@ -14,33 +9,40 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import toast from "react-hot-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { updateCourse } from "../../../actions/create-actions";
-import { CourseData } from "@/app/type/course";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import * as z from "zod";
 
-
-interface TitleFormProps {
-    initialData: CourseData;
-    courseId: string | undefined;
+interface ChapterTitleFormProps {
+    initialData: {
+        title: string;
+    };
+    courseId: string;
+    chapterId: string;
 }
 
 const formSchema = z.object({
     title: z.string().min(1, {
-        message: "title is required",
+        message: "Title is required.",
     }),
 });
 
-const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
+export const ChapterTitleForm = ({
+    initialData,
+    chapterId,
+    courseId,
+}: ChapterTitleFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            title: initialData?.title || "",
-        }
+        defaultValues: initialData,
     });
 
+    const router = useRouter();
 
     const [isEditing, setIsEditing] = useState(false);
 
@@ -48,52 +50,40 @@ const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
 
     const toggleEdit = () => setIsEditing((current) => !current);
 
-    const router = useRouter();
-
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        //console.log(values);
-        try {
-            if (!courseId) {
-                return {
-                    error: "Course not found",
-                };
+            try {
+                await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
+                toast.success("Chapter updated successfully")
+                toggleEdit();
+                router.refresh();
+            } catch (error) {
+                toast.error("Something went wrong");
             }
-            const title = await updateCourse(courseId, {title: values.title});
-            if (title?.success) {
-                toast.success("Course updated successfully")
-            } else {
-                toast.error(title?.error || "Something went wrong");
-            }
-        } catch (error) {
-            toast.error("Something went wrong!");
-        }
-    };
-
-
+    }
 
     return (
-        <div className="mt-6 border bg-slate-100 rounded-md p-4 dark:bg-black">
+        <div className="mt-6 bg-slate-100 border rounded-md p-4 dark:bg-black">
             <div className="font-medium flex items-center justify-between">
-                Course title
+                Chapter title
                 <Button variant="ghost" onClick={toggleEdit}>
                     {isEditing ? (
-                        <>Cancel</>
+                        <>Chancel</>
                     ) : (
                         <>
-                            <Pencil className="h-4 w-4 mr-2 " />
+                            <Pencil className="h-4 w-4 mr-2" />
                             Edit title
                         </>
                     )}
                 </Button>
             </div>
-                {!isEditing && (<p className="text-sm mt-2">{initialData?.title}</p>)}
-                {isEditing && (
-                    <Form {...form}>
+            {!isEditing && <p className="text-sm mt-2">{initialData.title}</p>}
+            {isEditing && (
+                <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4" >
                             <FormField control={form.control} name="title"
                             render={({field}) => (<FormItem>
                                 <FormControl>
-                                    <Input disabled={isSubmitting} placeholder="e.g. 'web Development, UI/UX'" {...field}/>
+                                    <Input disabled={isSubmitting} placeholder="e.g. Introduction to the course'" {...field}/>
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>)}
@@ -106,10 +96,7 @@ const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
                             </div>
                         </form>
                     </Form>
-                )}
+            )}
         </div>
     );
 };
-
-
-export default TitleForm;

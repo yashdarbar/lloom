@@ -2,13 +2,15 @@
 
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
+import { Course } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-type CourseProps = {
+type CourseProps = Course & {
     title?: string;
     description?: string | null;
     imageUrl?: string | null;
     categoryId?: string | null;
+    price?: string | null;
 };
 
 export async function createCourse(values: CourseProps) {
@@ -65,7 +67,7 @@ export async function getCourse(courseId: string) {
     }
 }
 
-export async function updateCourse(courseId: string, values: CourseProps) {
+export async function updateCourse(courseId: string, values: Partial<Course>) {
     try {
         const { userId } = auth();
 
@@ -85,6 +87,7 @@ export async function updateCourse(courseId: string, values: CourseProps) {
                 description: values.description,
                 imageUrl: values.imageUrl,
                 categoryId: values.categoryId,
+                price: values.price,
             },
         });
 

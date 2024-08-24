@@ -18,26 +18,25 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Course } from "@prisma/client";
-import { Input } from "@/components/ui/input";
-import { formatPrice } from "@/lib/format";
-import { updateCourse } from "../../../actions/create-actions";
-import { CourseData } from "@/app/type/course";
+import { Chapter, Course } from "@/src/app/generated/client";;
+import { Editor } from "@/components/editor";
+import { Preview } from "@/components/preview";
 
-interface PriceFormProps {
-    initialData: CourseData;
-    courseId: string | undefined;
+interface ChapterDescriptionFormProps {
+    initialData: Chapter;
+    courseId: string;
+    chapterId: string;
 }
 
 const formSchema = z.object({
-    price: z.coerce.number(),
+    description: z.string().min(1),
 });
 
-const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
+const ChapterDescriptionForm = ({ initialData, courseId, chapterId }: ChapterDescriptionFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            price: initialData?.price || undefined,
+            description: initialData?.description || ""
         },
     });
 
@@ -52,17 +51,10 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log(values);
         try {
-            if (!courseId) {
-                return {
-                    error: "Course not found",
-                };
-            }
-            const price = await updateCourse(courseId, {price: values.price});
-            if (price?.success) {
-                toast.success("Course updated successfully");
-            } else {
-                toast.error(price?.error || "Course not updated");
-            }
+            await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
+            toast.success("Chapter updated successfully");
+            toggleEdit();
+            router.refresh();
         } catch (error) {
             toast.error("Something went wrong!");
         }
@@ -71,27 +63,35 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4 dark:bg-black">
             <div className="font-medium flex items-center justify-between">
-                Course price
+                Chapter description
                 <Button variant="ghost" onClick={toggleEdit}>
                     {isEditing ? (
                         <>Cancel</>
                     ) : (
                         <>
                             <Pencil className="h-4 w-4 mr-2 " />
-                            Edit price
+                            Edit description
                         </>
                     )}
                 </Button>
             </div>
             {!isEditing && (
-                <p
+                <div
                     className={cn(
                         "text-sm mt-2",
-                        !initialData.price && "text-slate-500 italic"
+                        !initialData.description && "text-slate-500 italic"
                     )}
                 >
-                    {initialData.price ? formatPrice(initialData.price) : "No price"}
-                </p>
+                    {!initialData.description && "No description"}
+                    {initialData.description && (
+                        <>
+                            <Preview
+                                value={initialData.description}
+                            />
+
+                        </>
+                    )}
+                </div>
             )}
             {isEditing && (
                 <Form {...form}>
@@ -101,17 +101,11 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
                     >
                         <FormField
                             control={form.control}
-                            name="price"
+                            name="description"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Input
-                                            type="number"
-                                            step={0.01}
-                                            disabled={isSubmitting}
-                                            placeholder="Set your course price"
-                                            {...field}
-                                        />
+                                        <Editor {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -132,4 +126,4 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
     );
 };
 
-export default PriceForm;
+export default ChapterDescriptionForm;

@@ -23,13 +23,10 @@ import { Combobox } from "@/components/ui/combobox";
 import { updateCourse } from "../../../actions/create-actions";
 
 interface CategoryFormProps {
-    initialData:
-        | {
-              categoryId?: string | null;
-              id?: string;
-          }
-        | null
-        | undefined;
+    initialData: {
+            categoryId?: string | null;
+            id?: string;
+        } | null | undefined;
     courseId: string | undefined;
     options?: {
         label: string | undefined;
