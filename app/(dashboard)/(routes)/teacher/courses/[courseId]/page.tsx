@@ -12,30 +12,31 @@ import AttachmentForm from "./_components/attachment-form";
 import ChapterForm from "./_components/chapter-form";
 import CourseActions from "./_components/course-actions";
 import { getCategory, getCourse } from "../../actions/create-actions";
+import { Course } from "@prisma/client";
 //import Banner from "@/components/banner";
 
+interface CourseData extends Partial<Course> {
+    id?: string;
+}
+
 const CourseId = async ({ params }: { params: { courseId: string } }) => {
-
-    const course = await getCourse(params.courseId);
-    if (!course) {
-        return {
-            error: "Course not found"
-        };
+    const courseResult = await getCourse(params.courseId);
+    if (!courseResult || courseResult.error) {
+        return <div>Course not found</div>;
     }
+
+    const course: CourseData = courseResult.success || {};
+
     const categories = await getCategory();
-    console.log(categories);
-    if (!categories) {
-        return {
-            error: "Categories not found",
-        };
+    if (!categories || categories.error) {
+        return <div>Categories not found</div>;
     }
-
 
     const allTheFields = [
-        course?.success?.title,
-        course?.success?.description,
-        course?.success?.imageUrl,
-        course?.success?.categoryId,
+        course.title,
+        course.description,
+        course.imageUrl,
+        course.categoryId,
         //course?.success?.chapters.some((chapter) => chapter.isPublished),
     ];
 
@@ -73,34 +74,31 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                             <IconBagde icon={LayoutDashboard} />
                             <h2 className="text-xl">Customize your course</h2>
                         </div>
-                        <TitleForm
-                            initialData={course?.success}
-                            courseId={course?.success?.id}
-                        />
+                        <TitleForm initialData={course} courseId={course.id} />
                         <DescriptionForm
-                            initialData={course?.success}
-                            courseId={course?.success?.id}
+                            initialData={course}
+                            courseId={course.id}
                         />
-                        <ImageForm initialData={course?.success} courseId={course?.success?.id} />
+                        <ImageForm initialData={course} courseId={course.id} />
                         <CategoryForm
-                            initialData={course?.success}
-                            courseId={course?.success?.id}
+                            initialData={course}
+                            courseId={course.id}
                             options={categories?.success?.map((category) => ({
                                 label: category.name,
                                 value: category.id,
                             }))}
                         />
                     </div>
-                    {/* <div className="space-y-6">
+                    <div className="space-y-6">
                         <div>
                             <div className="flex items-center gap-x-2">
                                 <IconBagde icon={ListChecks} />
                                 <h2 className="text-xl">Course chapters</h2>
                             </div>
-                            <ChapterForm
-                                initialData={course}
-                                courseId={course.id}
-                            />
+                            {/* <ChapterForm
+                                initialData={course?.success}
+                                courseId={course?.success?.id}
+                            /> */}
                         </div>
                         <div>
                             <div className="flex items-center gap-x-2">
@@ -112,7 +110,8 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                                 courseId={course.id}
                             />
                         </div>
-                        <div>
+
+                        {/* <div>
                             <div className="flex items-center gap-x-2">
                                 <IconBagde icon={File} />
                                 <h2 className="text-xl">
@@ -123,8 +122,8 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                                 initialData={course}
                                 courseId={course.id}
                             />
-                        </div>
-                    </div> */}
+                        </div> */}
+                    </div>
                 </div>
             </div>
         </>
