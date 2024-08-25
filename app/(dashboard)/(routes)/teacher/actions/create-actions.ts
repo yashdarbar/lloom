@@ -57,6 +57,7 @@ export async function getCourse(courseId: string) {
             },
             include: {
                 attachments: true,
+                chapters: true,
             }
         });
         //revalidatePath(`/teacher/courses/${courseId}`);

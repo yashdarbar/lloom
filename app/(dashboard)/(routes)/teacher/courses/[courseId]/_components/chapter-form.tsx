@@ -14,17 +14,32 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Chapter, Course } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import ChaptersList from "./chapters-list";
+import { CourseData } from "@/app/type/course";
+import { getCourse } from "../../../actions/create-actions";
 
 interface ChapterFormProps {
-    initialData: Course & { chapters: Chapter[] };
+    initialData: CourseData;
+    courseId: string | undefined;
+}
+
+interface ChapterData {
+    id: string;
+    title: string;
+    description: string | null;
+    videoUrl: string | null;
+    position: number;
+    isPublished: boolean;
+    isFree: boolean;
     courseId: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const formSchema = z.object({
@@ -41,12 +56,25 @@ const ChapterForm = ({ initialData, courseId }: ChapterFormProps) => {
 
     const [isCreating, setIsCreating] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [chapters, setChapters] = useState<ChapterData[]>([]);
 
     const { isSubmitting, isValid } = form.formState;
 
     const toggleCreating = () => setIsCreating((current) => !current);
 
     const router = useRouter();
+
+    useEffect(()=>{
+        const fetchChapters = async () => {
+            if (courseId) {
+                const courseResult = await getCourse(courseId);
+                if (courseResult && "success" in courseResult && courseResult.success) {
+                    setChapters(courseResult.success.chapters as ChapterData[] || [])
+                }
+            }
+        };
+        fetchChapters();
+    }, [courseId])
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
@@ -136,15 +164,15 @@ const ChapterForm = ({ initialData, courseId }: ChapterFormProps) => {
                 <div
                     className={cn(
                         "text-sm mt-2",
-                        !initialData.chapters.length && "text-slate-500 italic"
+                        !chapters.length && "text-slate-500 italic"
                     )}
                 >
-                    {!initialData.chapters.length && "No chapters"}
-                    <ChaptersList
+                    {!chapters.length && "No chapters"}
+                    {/* <ChaptersList
                         onEdit={onEdit}
                         onReorder={onReorder}
                         items={initialData.chapters || []}
-                    />
+                    /> */}
                 </div>
             )}
             {!isCreating && (

@@ -12,12 +12,13 @@ import AttachmentForm from "./_components/attachment-form";
 import ChapterForm from "./_components/chapter-form";
 import CourseActions from "./_components/course-actions";
 import { getCategory, getCourse } from "../../actions/create-actions";
-import { Attachment, Course } from "@prisma/client";
+import { Attachment, Chapter, Course } from "@prisma/client";
 //import Banner from "@/components/banner";
 
 interface CourseData extends Partial<Course> {
     id?: string;
     attachments?: Attachment[];
+    chapters?: Chapter[];
 }
 
 const CourseId = async ({ params }: { params: { courseId: string } }) => {
@@ -28,6 +29,7 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
 
     const course: CourseData = courseResult.success || {};
     course.attachments = course.attachments || [];
+    course.chapters = course.chapters || [];
 
     const categories = await getCategory();
     if (!categories || categories.error) {
@@ -97,10 +99,10 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                                 <IconBagde icon={ListChecks} />
                                 <h2 className="text-xl">Course chapters</h2>
                             </div>
-                            {/* <ChapterForm
-                                initialData={course?.success}
-                                courseId={course?.success?.id}
-                            /> */}
+                            <ChapterForm
+                                initialData={course}
+                                courseId={course.id}
+                            />
                         </div>
                         <div>
                             <div className="flex items-center gap-x-2">
