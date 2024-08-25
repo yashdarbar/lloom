@@ -20,9 +20,11 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Chapter, Course } from "@prisma/client";
 import { Input } from "@/components/ui/input";
-import ChaptersList from "./chapters-list";
+//import ChaptersList from "./chapters-list";
 import { CourseData } from "@/app/type/course";
 import { getCourse } from "../../../actions/create-actions";
+import { createChapter } from "../../../actions/chapter-actions";
+import { time } from "console";
 
 interface ChapterFormProps {
     initialData: CourseData;
@@ -78,13 +80,29 @@ const ChapterForm = ({ initialData, courseId }: ChapterFormProps) => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            await axios.post(`/api/courses/${courseId}/chapters`, values);
-            toast.success("Chapter created");
-            toggleCreating();
-            router.refresh();
+            if (!courseId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const chapter = await createChapter(courseId, {title: values.title});
+            if (chapter?.success) {
+                toast.success("Course updated successfully");
+                toggleCreating();
+            } else {
+                toast.error(chapter?.error || "Course not updated");
+            }
         } catch (error) {
             toast.error("Something went wrong!");
         }
+        // try {
+        //     await axios.post(`/api/courses/${courseId}/chapters`, values);
+        //     toast.success("Chapter created");
+        //     toggleCreating();
+        //     router.refresh();
+        // } catch (error) {
+        //     toast.error("Something went wrong!");
+        // }
     };
 
     const onReorder = async (updateData: { id: string; position: number;}[]) => {

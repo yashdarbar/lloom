@@ -7,14 +7,14 @@ import { revalidatePath } from "next/cache";
 
 type CourseProps = Course & Attachment[] & {
     courseId: string | undefined;
-    title?: string;
+    title?: string | undefined;
     description?: string | null;
     imageUrl?: string | null;
     categoryId?: string | null;
     price?: string | null;
 };
 
-export async function createCourse(values: CourseProps) {
+export async function createCourse(values: Partial<Course>) {
     try {
         const { userId } = auth();
         if (!userId || !values.title) {

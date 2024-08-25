@@ -20,6 +20,9 @@ import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { createCourse } from "../actions/create-actions";
+import { CourseData } from "@/app/type/course";
+
+
 
 const formSchema = z.object({
     title: z.string().min(2, {
@@ -42,7 +45,7 @@ const CreatePage = () => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            const response = await createCourse(values);
+            const response = await createCourse({title: values.title});
             if (response?.success) {
                 router.push(`/teacher/courses/${response?.success?.id}`);
                 toast.success("Course created");
