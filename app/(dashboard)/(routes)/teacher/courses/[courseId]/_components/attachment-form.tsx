@@ -5,20 +5,34 @@ import axios from "axios";
 import { File, Loader2, PlusCircle, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { Attachment, Course } from "@/src/app/generated/client";
 import { FileUpload } from "@/components/file-upload";
-
+import { CourseData } from "@/app/type/course";
+import {
+    createAttachment,
+    deleteAttachment,
+    getCourse,
+} from "../../../actions/create-actions";
+import { Attachment } from "@prisma/client";
 
 interface AttachmentFormProps {
-    initialData: Course & {attachments: Attachment[]};
+    initialData: CourseData;
+    courseId: string | undefined;
+}
+
+interface AttachmentData {
+    id: string;
+    name: string;
+    url: string;
     courseId: string;
+    createdAt: string | Date;
+    updatedAt: string | Date;
 }
 
 const formSchema = z.object({
-    url: z.string().min(1)
+    url: z.string().min(1),
 });
 
 const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
@@ -26,17 +40,52 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
 
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
+    const [attachments, setAttachments] = useState<AttachmentData[]>([]);
+
     const toggleEdit = () => setIsEditing((current) => !current);
 
     const router = useRouter();
 
+    useEffect(() => {
+        const fetchAttachments = async () => {
+            if (courseId) {
+                const courseResult = await getCourse(courseId);
+                if (
+                    courseResult &&
+                    "success" in courseResult &&
+                    courseResult.success
+                ) {
+                    setAttachments(
+                        (courseResult.success
+                            .attachments as AttachmentData[]) || []
+                    );
+                }
+            }
+        };
+        fetchAttachments();
+    }, [courseId]);
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log(values);
         try {
-            await axios.post(`/api/courses/${courseId}/attachments`, values);
-            toast.success("course updated successfully");
-            toggleEdit();
-            router.refresh();
+            if (!courseId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const attachment = await createAttachment(courseId, {
+                url: values.url,
+            });
+            if (attachment?.success) {
+                toast.success("Course updated successfully");
+                setAttachments((prev) => [
+                    ...prev,
+                    attachment.success as Attachment,
+                ]);
+                toggleEdit();
+            } else {
+                toast.error(attachment?.error || "Course not updated");
+            }
         } catch (error) {
             toast.error("Something went wrong!");
         }
@@ -44,10 +93,22 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
 
     const onDelete = async (id: string) => {
         try {
+            if (!id || !courseId) {
+                return {
+                    error: "Course not found",
+                };
+            }
             setDeletingId(id); // here we are updating the state so the user experience should be good. i wont make any changes but it just for the loader experience.
-            await axios.delete(`/api/courses/${courseId}/attachments/${id}`);
-            toast.success("Attachment deleted");
-            router.refresh();
+            const attachmentDelete = await deleteAttachment(courseId, id);
+            if (attachmentDelete.success) {
+                toast.success("Attachment deleted successfully");
+            } else {
+                toast.error(
+                    attachmentDelete.error || "Attachment is not deleted"
+                );
+            }
+
+            //router.refresh();
         } catch {
             toast.error("Something went wrong!");
         } finally {
@@ -71,14 +132,14 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
             </div>
             {!isEditing && (
                 <>
-                    {initialData.attachments.length === 0 && (
+                    {attachments.length === 0 && (
                         <p className="text-sm text-slate-500 mt-2 italic">
                             No attachments yet
                         </p>
                     )}
-                    {initialData.attachments.length > 0 && (
+                    {attachments.length > 0 && (
                         <div className="space-y-2">
-                            {initialData.attachments.map((attachment) => (
+                            {attachments.map((attachment) => (
                                 <div
                                     key={attachment.id}
                                     className="flex items-center p-3 w-full bg-sky-100 border-sky-200 text-sky-700 rounded-md"

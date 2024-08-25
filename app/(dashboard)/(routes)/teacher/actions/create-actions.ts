@@ -2,10 +2,11 @@
 
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { Course } from "@prisma/client";
+import { Attachment, Course } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-type CourseProps = Course & {
+type CourseProps = Course & Attachment[] & {
+    courseId: string | undefined;
     title?: string;
     description?: string | null;
     imageUrl?: string | null;
@@ -54,6 +55,9 @@ export async function getCourse(courseId: string) {
                 userId,
                 id: courseId,
             },
+            include: {
+                attachments: true,
+            }
         });
         //revalidatePath(`/teacher/courses/${courseId}`);
         return {
@@ -118,4 +122,60 @@ export async function getCategory() {
             error: "GET_CATEGORY_ERROR",
         };
     }
+}
+
+export async function createAttachment(courseId: string, values: { url: string}) {
+    try {
+        if (!values || !courseId) {
+            return {
+                error: "Unauthorized or missing course",
+            };
+        }
+
+        const fileName = values.url.split("/").pop() || "unNamed_file";
+
+        const attachment = await db.attachment.create({
+            data: {
+                url: values.url,
+                name: fileName,
+                courseId: courseId,
+            },
+        });
+        return {
+            success: attachment,
+        };
+    } catch (error) {
+        console.log("[CREATE_ATTACHMENT]", error);
+        return {
+            error: "CREATE_ATTACHMENT_ERROR",
+        };
+    }
+}
+
+export async function deleteAttachment(courseId: string, attachmentId: string) {
+    try {
+        if (!courseId || !attachmentId) {
+            return {
+                error: "missing attachmentId or Course",
+            }
+        }
+
+        const attachment = await db.attachment.delete({
+            where: {
+                courseId: courseId,
+                id: attachmentId,
+            }
+        })
+
+        return {
+            success: attachment,
+        };
+
+    } catch (error) {
+        console.log("[DELETE_ATTACHMENT_ERROR]", error);
+        return {
+            error: "DELETE_ATTACHMENT_ERROR",
+        };
+    }
+
 }
