@@ -1,139 +1,139 @@
-// import { IconBagde } from "@/components/icon-bagde";
-// import { db } from "@/lib/db";
-// import { auth } from "@clerk/nextjs/server";
-// import {
-//     ArrowLeft,
-//     Eye,
-//     LayoutDashboard,
-//     Video,
-// } from "lucide-react";
-// import { redirect } from "next/navigation";
+import { IconBagde } from "@/components/icon-bagde";
+import { db } from "@/lib/db";
+import { auth } from "@clerk/nextjs/server";
+import {
+    ArrowLeft,
+    Eye,
+    LayoutDashboard,
+    Video,
+} from "lucide-react";
+import { redirect } from "next/navigation";
 
-// import React from "react";
-// import { ChapterTitleForm } from "./_components/chapter-title-form";
-// import Link from "next/link";
-// // import ChapterDescriptionForm from "./_components/chapter-description-form";
-// // import ChapterAccessForm from "./_components/chapter-access-form";
-// // import ChapterVideoForm from "./_components/video-form";
-// // import Banner from "@/components/banner";
-// // import ChapterActions from "./_components/chapter-actions";
+import React from "react";
+//import { ChapterTitleForm } from "./_components/chapter-title-form";
+import Link from "next/link";
+// import ChapterDescriptionForm from "./_components/chapter-description-form";
+// import ChapterAccessForm from "./_components/chapter-access-form";
+// import ChapterVideoForm from "./_components/video-form";
+// import Banner from "@/components/banner";
+// import ChapterActions from "./_components/chapter-actions";
 
-// const ChapterId = async ({
-//     params,
-// }: {
-//     params: { courseId: string; chapterId: string };
-// }) => {
-//     const { userId } = auth();
-//     if (!userId) {
-//         return redirect("/");
-//     }
+const ChapterId = async ({
+    params,
+}: {
+    params: { courseId: string; chapterId: string };
+}) => {
+    const { userId } = auth();
+    if (!userId) {
+        return redirect("/");
+    }
 
-//     const chapter = await db.chapter.findUnique({
-//         where: { courseId: params.courseId, id: params.chapterId },
-//         include: {
-//             muxData: true,
-//         },
-//     });
+    const chapter = await db.chapter.findUnique({
+        where: { courseId: params.courseId, id: params.chapterId },
+        include: {
+            muxData: true,
+        },
+    });
 
-//     if (!chapter) {
-//         return redirect("/");
-//     }
+    if (!chapter) {
+        return redirect("/");
+    }
 
-//     const requiredFields = [
-//         chapter.title,
-//         chapter.description,
-//         chapter.videoUrl,
-//     ];
+    const requiredFields = [
+        chapter.title,
+        chapter.description,
+        chapter.videoUrl,
+    ];
 
-//     const totalFields = requiredFields.length;
-//     const completedFields = requiredFields.filter(Boolean).length;
+    const totalFields = requiredFields.length;
+    const completedFields = requiredFields.filter(Boolean).length;
 
-//     const completionText = `${completedFields}/${totalFields}`;
+    const completionText = `${completedFields}/${totalFields}`;
 
-//     const isCompleteFields = requiredFields.every(Boolean);
+    const isCompleteFields = requiredFields.every(Boolean);
 
-//     return (
-//         <>
-//         {/* {!chapter.isPublished &&
-//             <Banner variant="warning" label="This chapter is unpublished. It will not be visible in the course"/>
-//         } */}
-//             <div className="p-6">
-//                 <div className="flex justify-between items-center">
-//                     <div className="w-full">
-//                         <Link
-//                             href={`/teacher/courses/${params.courseId}`}
-//                             className="flex items-center text-base hover:opacity-75 transition mb-6"
-//                         >
-//                             <ArrowLeft className="h-4 w-4 mr-2" />
-//                             Back to the course
-//                         </Link>
-//                         <div className="flex items-center justify-between w-full">
-//                             <div className="flex flex-col gap-y-2">
-//                                 <h1 className="text-2xl font-medium">
-//                                     Chapter setup
-//                                 </h1>
-//                                 <span className="text-sm text-slate-700 dark:text-slate-300">
-//                                     Complete all fields: {completionText}
-//                                 </span>
-//                             </div>
-//                             {/* <ChapterActions
-//                             disabled={!isCompleteFields}
-//                             chapterId={params.chapterId}
-//                             courseId={params.courseId}
-//                             isPublished={chapter.isPublished}
-//                             /> */}
-//                         </div>
-//                     </div>
-//                 </div>
-//                 <div className="grid grid-cols-1 md:grid-cols-2 mt-14 gap-6">
-//                     <div className="space-y-4">
-//                         <div>
-//                             <div className="flex items-center gap-x-2">
-//                                 <IconBagde icon={LayoutDashboard} />
-//                                 <h2 className="text-xl">
-//                                     Customize your chapter
-//                                 </h2>
-//                             </div>
-//                             <ChapterTitleForm
-//                                 initialData={chapter}
-//                                 chapterId={params.chapterId}
-//                                 courseId={params.courseId}
-//                             />
-//                             {/* <ChapterDescriptionForm
-//                                 initialData={chapter}
-//                                 chapterId={params.chapterId}
-//                                 courseId={params.courseId}
-//                             /> */}
-//                         </div>
-//                         <div>
-//                             <div className="flex items-center gap-x-2">
-//                                 <IconBagde icon={Eye} />
-//                                 <h2 className="text-xl">Access Settings</h2>
-//                             </div>
-//                             {/* <ChapterAccessForm
-//                                 initialData={chapter}
-//                                 chapterId={params.chapterId}
-//                                 courseId={params.courseId}
-//                             /> */}
-//                         </div>
-//                     </div>
-//                     <div className="space-y-4">
-//                         <div>
-//                             <div className="flex items-center gap-x-2">
-//                                 <IconBagde icon={Video} />
-//                                 <h2 className="text-xl">Add a video</h2>
-//                             </div>
-//                         </div>
-//                         {/* <ChapterVideoForm
-//                             initialData={chapter}
-//                             chapterId={params.chapterId}
-//                             courseId={params.courseId}
-//                         /> */}
-//                     </div>
-//                 </div>
-//             </div>
-//         </>
-//     );
-// };
+    return (
+        <>
+        {/* {!chapter.isPublished &&
+            <Banner variant="warning" label="This chapter is unpublished. It will not be visible in the course"/>
+        } */}
+            <div className="p-6">
+                <div className="flex justify-between items-center">
+                    <div className="w-full">
+                        <Link
+                            href={`/teacher/courses/${params.courseId}`}
+                            className="flex items-center text-base hover:opacity-75 transition mb-6"
+                        >
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Back to the course
+                        </Link>
+                        <div className="flex items-center justify-between w-full">
+                            <div className="flex flex-col gap-y-2">
+                                <h1 className="text-2xl font-medium">
+                                    Chapter setup
+                                </h1>
+                                <span className="text-sm text-slate-700 dark:text-slate-300">
+                                    Complete all fields: {completionText}
+                                </span>
+                            </div>
+                            {/* <ChapterActions
+                            disabled={!isCompleteFields}
+                            chapterId={params.chapterId}
+                            courseId={params.courseId}
+                            isPublished={chapter.isPublished}
+                            /> */}
+                        </div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 mt-14 gap-6">
+                    <div className="space-y-4">
+                        <div>
+                            <div className="flex items-center gap-x-2">
+                                <IconBagde icon={LayoutDashboard} />
+                                <h2 className="text-xl">
+                                    Customize your chapter
+                                </h2>
+                            </div>
+                            {/* <ChapterTitleForm
+                                initialData={chapter}
+                                chapterId={params.chapterId}
+                                courseId={params.courseId}
+                            /> */}
+                            {/* <ChapterDescriptionForm
+                                initialData={chapter}
+                                chapterId={params.chapterId}
+                                courseId={params.courseId}
+                            /> */}
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-x-2">
+                                <IconBagde icon={Eye} />
+                                <h2 className="text-xl">Access Settings</h2>
+                            </div>
+                            {/* <ChapterAccessForm
+                                initialData={chapter}
+                                chapterId={params.chapterId}
+                                courseId={params.courseId}
+                            /> */}
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <div>
+                            <div className="flex items-center gap-x-2">
+                                <IconBagde icon={Video} />
+                                <h2 className="text-xl">Add a video</h2>
+                            </div>
+                        </div>
+                        {/* <ChapterVideoForm
+                            initialData={chapter}
+                            chapterId={params.chapterId}
+                            courseId={params.courseId}
+                        /> */}
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
 
-// export default ChapterId;
+export default ChapterId;

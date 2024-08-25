@@ -20,11 +20,11 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Chapter, Course } from "@prisma/client";
 import { Input } from "@/components/ui/input";
-//import ChaptersList from "./chapters-list";
+import ChaptersList from "./chapters-list";
 import { CourseData } from "@/app/type/course";
 import { getCourse } from "../../../actions/create-actions";
-import { createChapter } from "../../../actions/chapter-actions";
-import { time } from "console";
+import { createChapter, reorderChapters } from "../../../actions/chapter-actions";
+import Link from "next/link";
 
 interface ChapterFormProps {
     initialData: CourseData;
@@ -87,33 +87,35 @@ const ChapterForm = ({ initialData, courseId }: ChapterFormProps) => {
             }
             const chapter = await createChapter(courseId, {title: values.title});
             if (chapter?.success) {
-                toast.success("Course updated successfully");
+                toast.success("Chapter updated successfully");
                 toggleCreating();
             } else {
-                toast.error(chapter?.error || "Course not updated");
+                toast.error(chapter?.error || "Chapter not updated");
             }
         } catch (error) {
             toast.error("Something went wrong!");
         }
-        // try {
-        //     await axios.post(`/api/courses/${courseId}/chapters`, values);
-        //     toast.success("Chapter created");
-        //     toggleCreating();
-        //     router.refresh();
-        // } catch (error) {
-        //     toast.error("Something went wrong!");
-        // }
     };
 
     const onReorder = async (updateData: { id: string; position: number;}[]) => {
         try {
+            if (!courseId) {
+                return {
+                    error: "Course not found",
+                };
+            }
             setIsUpdating(true);
-            console.log("sfa", updateData);
-            await axios.put(`/api/courses/${courseId}/chapters/reorder`, {
-                list: updateData,
-            });
-            toast.success("Chapters reordered");
-            router.refresh();
+            const result = await reorderChapters({courseId, list: updateData});
+            // await axios.put(`/api/courses/${courseId}/chapters/reorder`, {
+            //     list: updateData,
+            // });
+            if (result?.success) {
+                toast.success("Chapters reordered");
+            } else {
+                toast.error(result?.error || "Chapter not reordered");
+            }
+
+            //router.refresh();
         } catch {
             toast.error("Something went wrong!");
         } finally {
@@ -121,8 +123,9 @@ const ChapterForm = ({ initialData, courseId }: ChapterFormProps) => {
         }
     }
 
-    const onEdit = (id: string) => {
-        router.push(`/teacher/courses/${courseId}/chapters/${id}`);
+    const onEdit = (id: string): string => {
+        return `/teacher/courses/${courseId}/chapters/${id}`;
+
     }
     //console.log(isCreating);
 
@@ -186,11 +189,11 @@ const ChapterForm = ({ initialData, courseId }: ChapterFormProps) => {
                     )}
                 >
                     {!chapters.length && "No chapters"}
-                    {/* <ChaptersList
+                    <ChaptersList
                         onEdit={onEdit}
                         onReorder={onReorder}
-                        items={initialData.chapters || []}
-                    /> */}
+                        items={chapters || []}
+                    />
                 </div>
             )}
             {!isCreating && (
