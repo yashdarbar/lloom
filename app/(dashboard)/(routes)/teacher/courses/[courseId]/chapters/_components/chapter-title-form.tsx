@@ -1,5 +1,6 @@
 "use client";
 
+import { ChapterData } from "@/app/type/course";
 import { Button } from "@/components/ui/button";
 import {
     Form,
@@ -19,11 +20,9 @@ import toast from "react-hot-toast";
 import * as z from "zod";
 
 interface ChapterTitleFormProps {
-    initialData: {
-        title: string;
-    };
-    courseId: string;
-    chapterId: string;
+    initialData: ChapterData;
+    courseId: string | undefined;
+    chapterId: string | undefined;
 }
 
 const formSchema = z.object({
@@ -76,7 +75,7 @@ export const ChapterTitleForm = ({
                     )}
                 </Button>
             </div>
-            {!isEditing && <p className="text-sm mt-2">{initialData.title}</p>}
+            {!isEditing && <p className="text-sm mt-2">{initialData?.title}</p>}
             {isEditing && (
                 <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4" >

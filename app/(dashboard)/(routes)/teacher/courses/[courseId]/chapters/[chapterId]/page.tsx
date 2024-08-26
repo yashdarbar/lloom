@@ -10,8 +10,11 @@ import {
 import { redirect } from "next/navigation";
 
 import React from "react";
-//import { ChapterTitleForm } from "./_components/chapter-title-form";
+
 import Link from "next/link";
+import { getChapter } from "../../../../actions/chapter-actions";
+import { ChapterData } from "@/app/type/course";
+import { ChapterTitleForm } from "../_components/chapter-title-form";
 // import ChapterDescriptionForm from "./_components/chapter-description-form";
 // import ChapterAccessForm from "./_components/chapter-access-form";
 // import ChapterVideoForm from "./_components/video-form";
@@ -28,13 +31,13 @@ const ChapterId = async ({
         return redirect("/");
     }
 
-    const chapter = await db.chapter.findUnique({
-        where: { courseId: params.courseId, id: params.chapterId },
-        include: {
-            muxData: true,
-        },
-    });
+    const chapterResult = await getChapter(params.courseId, params.chapterId);
+    if (!chapterResult || chapterResult.error) {
+        return <div>Course not found</div>;
+    }
 
+    const chapter: ChapterData = chapterResult.success || {};
+    
     if (!chapter) {
         return redirect("/");
     }
@@ -94,11 +97,11 @@ const ChapterId = async ({
                                     Customize your chapter
                                 </h2>
                             </div>
-                            {/* <ChapterTitleForm
+                            <ChapterTitleForm
                                 initialData={chapter}
-                                chapterId={params.chapterId}
-                                courseId={params.courseId}
-                            /> */}
+                                chapterId={chapter.id}
+                                courseId={chapter.courseId}
+                            />
                             {/* <ChapterDescriptionForm
                                 initialData={chapter}
                                 chapterId={params.chapterId}

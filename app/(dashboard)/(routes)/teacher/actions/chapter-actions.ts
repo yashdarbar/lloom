@@ -104,33 +104,68 @@ export async function reorderChapters({
         return { error: "Something went wrong" };
     }
 }
-// export async function reorderChapter(courseId: string, list) {
-//     try {
-//         const { userId } = auth();
-//         if (!userId || !courseId) {
-//             return {
-//                 error: "Unauthorized or Coure is not found",
-//             };
-//         }
 
-//         const courseOwner = db.course.findUnique({
-//             where: {
-//                 id: courseId,
-//                 userId: userId,
-//             },
-//         });
+export async function getChapter(courseId: string, chapterId: string) {
+    try {
+        const { userId } = auth();
 
-//         if (!courseOwner) {
-//             return {
-//                 error: "Unauthorized Course",
-//             };
-//         }
+        if (!userId || !courseId || !chapterId) {
+            return {
+                error: "Unauthorized or missing chapter",
+            };
+        }
+        console.log("cid",courseId, userId, chapterId);
 
+        const getChapter = await db.chapter.findUnique({
+            where: {
+                courseId: courseId,
+                id: chapterId,
+            },
+            include: {
+                muxData: true,
+            },
+        });
+        //revalidatePath(`/teacher/courses/${courseId}`);
+        console.log("bruhh",getChapter);
+        return {
+            success: getChapter,
+        };
 
-//     } catch (error) {
-//         console.log("[REORDER_CHAPTER]", error);
-//         return {
-//             error: "REORDER_CHAPTER_ERROR",
-//         };
-//     }
-// }
+    } catch (error) {
+        console.log("[GET_CHAPTER]", error);
+        return {
+            error: "GET_CHAPTER_ERROR",
+        };
+    }
+}
+
+export async function updateChapter(chapterId: string, values: Partial<Chapter>) {
+    try {
+        const { userId } = auth();
+
+        if (!userId || !chapterId) {
+            return {
+                error: "Unauthorized or missing course",
+            };
+        }
+
+        const updateChapter = await db.chapter.update({
+            where: {
+                id: chapterId,
+                courseId: values.courseId
+            },
+            data: {
+                ...values,
+            },
+        });
+
+        return {
+            success: updateChapter,
+        };
+    } catch (error) {
+        console.log("[UPDATE_CHAPTER]", error);
+        return {
+            error: "UPDATE_CHAPTER_ERROR",
+        };
+    }
+}
