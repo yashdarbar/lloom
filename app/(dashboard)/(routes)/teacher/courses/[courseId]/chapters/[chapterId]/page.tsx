@@ -15,7 +15,8 @@ import Link from "next/link";
 import { getChapter } from "../../../../actions/chapter-actions";
 import { ChapterData } from "@/app/type/course";
 import { ChapterTitleForm } from "../_components/chapter-title-form";
-// import ChapterDescriptionForm from "./_components/chapter-description-form";
+import ChapterDescriptionForm from "../_components/chapter-description-form";
+
 // import ChapterAccessForm from "./_components/chapter-access-form";
 // import ChapterVideoForm from "./_components/video-form";
 // import Banner from "@/components/banner";
@@ -37,7 +38,7 @@ const ChapterId = async ({
     }
 
     const chapter: ChapterData = chapterResult.success || {};
-    
+
     if (!chapter) {
         return redirect("/");
     }
@@ -57,7 +58,7 @@ const ChapterId = async ({
 
     return (
         <>
-        {/* {!chapter.isPublished &&
+            {/* {!chapter.isPublished &&
             <Banner variant="warning" label="This chapter is unpublished. It will not be visible in the course"/>
         } */}
             <div className="p-6">
@@ -102,11 +103,11 @@ const ChapterId = async ({
                                 chapterId={chapter.id}
                                 courseId={chapter.courseId}
                             />
-                            {/* <ChapterDescriptionForm
+                            <ChapterDescriptionForm
                                 initialData={chapter}
-                                chapterId={params.chapterId}
-                                courseId={params.courseId}
-                            /> */}
+                                chapterId={chapter.id}
+                                courseId={chapter.courseId}
+                            />
                         </div>
                         <div>
                             <div className="flex items-center gap-x-2">

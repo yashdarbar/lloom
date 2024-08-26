@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import * as z from "zod";
+import { updateChapter } from "../../../../actions/chapter-actions";
 
 interface ChapterTitleFormProps {
     initialData: ChapterData;
@@ -51,10 +52,21 @@ export const ChapterTitleForm = ({
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
             try {
-                await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
-                toast.success("Chapter updated successfully")
-                toggleEdit();
-                router.refresh();
+                if (!chapterId) {
+                    return {
+                        error: "Course not found",
+                    };
+                }
+                const title = await updateChapter(chapterId, {
+                    title: values.title,
+                });
+                if (title?.success) {
+                    toast.success("Chapter updated successfully");
+                    toggleEdit();
+                } else {
+                    toast.error(title?.error || "Something went wrong");
+                }
+                
             } catch (error) {
                 toast.error("Something went wrong");
             }

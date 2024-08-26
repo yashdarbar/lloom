@@ -18,14 +18,16 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Chapter, Course } from "@/src/app/generated/client";;
+import { Chapter, Course } from "@prisma/client";;
 import { Editor } from "@/components/editor";
 import { Preview } from "@/components/preview";
+import { ChapterData } from "@/app/type/course";
+import { updateChapter } from "../../../../actions/chapter-actions";
 
 interface ChapterDescriptionFormProps {
-    initialData: Chapter;
-    courseId: string;
-    chapterId: string;
+    initialData: ChapterData;
+    courseId: string | undefined;
+    chapterId: string | undefined;
 }
 
 const formSchema = z.object({
@@ -51,10 +53,20 @@ const ChapterDescriptionForm = ({ initialData, courseId, chapterId }: ChapterDes
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log(values);
         try {
-            await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
-            toast.success("Chapter updated successfully");
-            toggleEdit();
-            router.refresh();
+            if (!chapterId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const description = await updateChapter(chapterId, {
+                description: values.description,
+            });
+            if (description?.success) {
+                toast.success("Chapter updated successfully");
+                toggleEdit();
+            } else {
+                toast.error(description?.error || "Something went wrong");
+            }
         } catch (error) {
             toast.error("Something went wrong!");
         }
