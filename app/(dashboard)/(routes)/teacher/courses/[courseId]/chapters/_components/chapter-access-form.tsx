@@ -18,13 +18,14 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Chapter, Course } from "@/src/app/generated/client";;
 import { Checkbox } from "@/components/ui/checkbox";
+import { ChapterData } from "@/app/type/course";
+import { updateChapter } from "../../../../actions/chapter-actions";
 
 interface ChapterAccessFormProps {
-    initialData: Chapter;
-    courseId: string;
-    chapterId: string;
+    initialData: ChapterData;
+    courseId: string | undefined;
+    chapterId: string | undefined;
 }
 
 const formSchema = z.object({
@@ -45,15 +46,23 @@ const ChapterAccessForm = ({ initialData, courseId, chapterId }: ChapterAccessFo
 
     const toggleEdit = () => setIsEditing((current) => !current);
 
-    const router = useRouter();
-
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log(values);
         try {
-            await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
-            toast.success("Chapter updated successfully");
-            toggleEdit();
-            router.refresh();
+            if (!chapterId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const chapterAccess = await updateChapter(chapterId, {
+                isFree: values.isFree,
+            });
+            if (chapterAccess?.success) {
+                toast.success("Chapter updated successfully");
+                toggleEdit();
+            } else {
+                toast.error(chapterAccess?.error || "Something went wrong");
+            }
         } catch (error) {
             toast.error("Something went wrong!");
         }

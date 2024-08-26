@@ -51,7 +51,7 @@ const ChapterDescriptionForm = ({ initialData, courseId, chapterId }: ChapterDes
     const router = useRouter();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        //console.log(values);
         try {
             if (!chapterId) {
                 return {

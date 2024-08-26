@@ -16,6 +16,7 @@ import { getChapter } from "../../../../actions/chapter-actions";
 import { ChapterData } from "@/app/type/course";
 import { ChapterTitleForm } from "../_components/chapter-title-form";
 import ChapterDescriptionForm from "../_components/chapter-description-form";
+import ChapterAccessForm from "../_components/chapter-access-form";
 
 // import ChapterAccessForm from "./_components/chapter-access-form";
 // import ChapterVideoForm from "./_components/video-form";
@@ -114,11 +115,11 @@ const ChapterId = async ({
                                 <IconBagde icon={Eye} />
                                 <h2 className="text-xl">Access Settings</h2>
                             </div>
-                            {/* <ChapterAccessForm
+                            <ChapterAccessForm
                                 initialData={chapter}
-                                chapterId={params.chapterId}
-                                courseId={params.courseId}
-                            /> */}
+                                chapterId={chapter.id}
+                                courseId={chapter.courseId}
+                            />
                         </div>
                     </div>
                     <div className="space-y-4">
