@@ -7,11 +7,12 @@ import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { chapterPublish, chapterUnpublish } from "../../../../actions/chapter-actions";
 
 interface ChapterActionsProps {
-    chapterId: string;
-    courseId: string;
-    isPublished: boolean;
+    chapterId: string | undefined;
+    courseId: string | undefined;
+    isPublished: boolean | undefined;
     disabled: boolean;
 }
 
@@ -28,20 +29,28 @@ const ChapterActions = ({
     const onClick = async () => {
         try {
             setIsLoading(true);
+            if (!courseId || !chapterId) {
+                return "CourseId or chapterId not found"
+            }
             if (isPublished) {
-                await axios.patch(
-                    `/api/courses/${courseId}/chapters/${chapterId}/unpublish`
+                const unpublish = await chapterUnpublish(
+                    chapterId,
+                    courseId,
                 );
-                toast.success("Chapter is Unpublished");
+                if (unpublish?.success) {
+                    toast.success("Chapter is Unpublished");
+                } else {
+                    toast.error(unpublish?.error || "Something went wrong");
+                }
             }
             if (!isPublished) {
-                await axios.patch(
-                    `/api/courses/${courseId}/chapters/${chapterId}/publish`
-                );
-                toast.success("Chapter is Published");
+                const publish = await chapterPublish(chapterId, courseId);
+                if (publish?.success) {
+                    toast.success("Chapter is Published");
+                } else {
+                    toast.error(publish?.error || "Something went wrong");
+                }
             }
-
-            router.refresh();
         } catch {
             toast.error("Something went wrong");
         } finally {

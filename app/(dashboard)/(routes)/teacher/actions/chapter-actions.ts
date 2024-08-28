@@ -124,8 +124,7 @@ export async function getChapter(courseId: string, chapterId: string) {
                 error: "Unauthorized or missing chapter",
             };
         }
-        //console.log("cid",courseId, userId, chapterId);
-
+        
         const getChapter = await db.chapter.findUnique({
             where: {
                 courseId: courseId,
@@ -207,6 +206,133 @@ export async function updateChapter(
         console.log("[UPDATE_CHAPTER]", error);
         return {
             error: "UPDATE_CHAPTER_ERROR",
+        };
+    }
+}
+
+export async function chapterPublish(chapterId: string, courseId: string) {
+    try {
+        const { userId } = auth();
+
+        if (!userId || !chapterId) {
+            return {
+                error: "Unauthorized or missing course",
+            };
+        }
+
+        const courseOwner = await db.course.findUnique({
+            where: {
+                id: courseId,
+                userId: userId,
+            },
+        });
+
+        if (!courseOwner) {
+            return { error: "Unauthorized" };
+        }
+
+        const chapter = await db.chapter.findUnique({
+            where: {
+                id: chapterId,
+                courseId,
+            },
+        });
+
+        const muxData = await db.muxData.findUnique({
+            where: {
+                chapterId,
+            },
+        });
+
+        if (
+            !chapter ||
+            !muxData ||
+            !chapter?.title ||
+            !chapter.description ||
+            !chapter.videoUrl
+        ) {
+            return {
+                error: "Missing required parameters",
+            };
+        }
+
+        const publishedChapter = await db.chapter.update({
+            where: {
+                id: chapterId,
+                courseId,
+            },
+            data: {
+                isPublished: true,
+            },
+        });
+
+        return {
+            success: publishedChapter,
+        };
+    } catch (error) {
+        console.log("[CHAPTER_PUBLISH]", error);
+        return {
+            error: "CHAPTER_PUBLISH_ERROR",
+        };
+    }
+}
+
+export async function chapterUnpublish(chapterId: string, courseId: string) {
+    try {
+        const { userId } = auth();
+
+        if (!userId || !chapterId) {
+            return {
+                error: "Unauthorized or missing course",
+            };
+        }
+
+        const courseOwner = await db.course.findUnique({
+            where: {
+                id: courseId,
+                userId: userId,
+            },
+        });
+
+        if (!courseOwner) {
+            return { error: "Course not found" };
+        }
+
+        const unpublishedChapter = await db.chapter.update({
+            where: {
+                id: chapterId,
+                courseId,
+            },
+            data: {
+                isPublished: false,
+            },
+        });
+
+        const publishedChaptersInCourse = await db.chapter.findMany({
+            where: {
+                courseId,
+                isPublished: true,
+            },
+        });
+
+        if (!publishedChaptersInCourse.length) {
+            await db.course.update({
+                where: {
+                    id: courseId,
+                },
+                data: {
+                    isPublished: false,
+                },
+            });
+        }
+
+        return {
+            success: unpublishedChapter,
+        };
+    } catch (error) {
+        console.log("[CHAPTER_UNPUBLISH]", error);
+        return {
+            error: "CHAPTER_UNPUBLISH_ERROR",
         };
     }
 }

@@ -13,6 +13,7 @@ import ChapterForm from "./_components/chapter-form";
 import CourseActions from "./_components/course-actions";
 import { getCategory, getCourse } from "../../actions/create-actions";
 import { Attachment, Chapter, Course } from "@prisma/client";
+import Banner from "@/components/banner";
 //import Banner from "@/components/banner";
 
 interface CourseData extends Partial<Course> {
@@ -52,12 +53,12 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
 
     return (
         <>
-            {/* {!course.isPublished && (
+            {!course.isPublished && (
                 <Banner
                     variant="warning"
                     label="This Course is unpublised. To make is publised complete all the required fields."
                 />
-            )} */}
+            )}
             <div className="p-6">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-y-2">

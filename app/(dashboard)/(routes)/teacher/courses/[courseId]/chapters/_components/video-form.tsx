@@ -31,7 +31,7 @@ const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVideoForm
     // const router = useRouter();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        //console.log(values);
         try {
             if (!chapterId) {
                 return {
@@ -56,7 +56,6 @@ const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVideoForm
         }
     };
 
-    console.log("videul", initialData.muxData?.playbackId);
 
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4 dark:bg-black">
