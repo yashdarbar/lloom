@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { redirect } from "next/navigation";
 
-import React from "react";
 
 import Link from "next/link";
 import { getChapter } from "../../../../actions/chapter-actions";
@@ -17,11 +16,8 @@ import { ChapterData } from "@/app/type/course";
 import { ChapterTitleForm } from "../_components/chapter-title-form";
 import ChapterDescriptionForm from "../_components/chapter-description-form";
 import ChapterAccessForm from "../_components/chapter-access-form";
+import ChapterVideoForm from "../_components/video-form";
 
-// import ChapterAccessForm from "./_components/chapter-access-form";
-// import ChapterVideoForm from "./_components/video-form";
-// import Banner from "@/components/banner";
-// import ChapterActions from "./_components/chapter-actions";
 
 const ChapterId = async ({
     params,
@@ -129,11 +125,11 @@ const ChapterId = async ({
                                 <h2 className="text-xl">Add a video</h2>
                             </div>
                         </div>
-                        {/* <ChapterVideoForm
+                        <ChapterVideoForm
                             initialData={chapter}
-                            chapterId={params.chapterId}
-                            courseId={params.courseId}
-                        /> */}
+                            chapterId={chapter.id}
+                            courseId={chapter.courseId}
+                        />
                     </div>
                 </div>
             </div>

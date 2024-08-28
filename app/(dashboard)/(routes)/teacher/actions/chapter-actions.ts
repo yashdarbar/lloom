@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import Mux from "@mux/mux-node";
 import { auth } from "@clerk/nextjs/server";
 import { Chapter } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -10,6 +11,16 @@ interface ReorderChaptersInput {
     courseId: string;
     list: { id: string; position: number }[];
 }
+
+const { video } = new Mux({
+    // tokenId: process.env.MUX_TOKEN_ID as string,
+    // tokenSecret: process.env.MUX_TOKEN_SECRET as string,
+    tokenId: "f1e4c75e-74eb-45d5-87d3-1019c9580a23", //process.env.MUX_TOKEN_ID as string,
+    tokenSecret:
+        "jaz3JnDGoaAaSz78iiW2N9l2u4ms2xpqu+I//WsDePBCajyU3MSL435anXRgfg9diZy2c2WQgIr", //process.env.MUX_TOKEN_SECRET as string,
+});
+
+//console.log("mmxx", video);
 
 export async function createChapter(
     courseId: string,
@@ -66,7 +77,6 @@ export async function createChapter(
     }
 }
 
-
 export async function reorderChapters({
     courseId,
     list,
@@ -114,7 +124,7 @@ export async function getChapter(courseId: string, chapterId: string) {
                 error: "Unauthorized or missing chapter",
             };
         }
-        console.log("cid",courseId, userId, chapterId);
+        //console.log("cid",courseId, userId, chapterId);
 
         const getChapter = await db.chapter.findUnique({
             where: {
@@ -126,11 +136,10 @@ export async function getChapter(courseId: string, chapterId: string) {
             },
         });
         //revalidatePath(`/teacher/courses/${courseId}`);
-        console.log("bruhh",getChapter);
+        //console.log("bruhh",getChapter);
         return {
             success: getChapter,
         };
-
     } catch (error) {
         console.log("[GET_CHAPTER]", error);
         return {
@@ -139,7 +148,10 @@ export async function getChapter(courseId: string, chapterId: string) {
     }
 }
 
-export async function updateChapter(chapterId: string, values: Partial<Chapter>) {
+export async function updateChapter(
+    chapterId: string,
+    values: Partial<Chapter>
+) {
     try {
         const { userId } = auth();
 
@@ -152,13 +164,42 @@ export async function updateChapter(chapterId: string, values: Partial<Chapter>)
         const updateChapter = await db.chapter.update({
             where: {
                 id: chapterId,
-                courseId: values.courseId
+                courseId: values.courseId,
             },
             data: {
                 ...values,
             },
         });
 
+        if (values.videoUrl) {
+            const existingMuxData = await db.muxData.findFirst({
+                where: {
+                    chapterId: chapterId,
+                },
+            });
+
+            if (existingMuxData) {
+                await video.assets.delete(existingMuxData.assetId);
+                await db.muxData.delete({
+                    where: {
+                        id: existingMuxData.id,
+                    },
+                });
+            }
+
+            const asset = await video.assets.create({
+                input: [{ url: values.videoUrl }],
+                playback_policy: ["public"],
+            });
+
+            await db.muxData.create({
+                data: {
+                    assetId: asset.id,
+                    chapterId: chapterId,
+                    playbackId: asset.playback_ids?.[0]?.id,
+                },
+            });
+        }
         return {
             success: updateChapter,
         };

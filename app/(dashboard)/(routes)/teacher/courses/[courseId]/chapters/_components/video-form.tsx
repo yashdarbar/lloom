@@ -8,14 +8,15 @@ import  MuxPlayer  from "@mux/mux-player-react"
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { Chapter, MuxData } from "@/src/app/generated/client";
+//import { useRouter } from "next/navigation";
 import { FileUpload } from "@/components/file-upload";
+import { ChapterData, MuxDataType} from "@/app/type/course";
+import { updateChapter } from "../../../../actions/chapter-actions";
 
 interface ChapterVideoFormProps {
-    initialData: Chapter & { muxData?: MuxData | null };
-    courseId: string;
-    chapterId: string;
+    initialData: ChapterData & { muxData?: MuxDataType | null };
+    courseId: string | undefined;
+    chapterId: string | undefined;
 }
 
 const formSchema = z.object({
@@ -27,19 +28,35 @@ const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVideoForm
 
     const toggleEdit = () => setIsEditing((current) => !current);
 
-    const router = useRouter();
+    // const router = useRouter();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         console.log(values);
         try {
-            await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`,values);
-            toast.success("chapter video uploaded successfully");
-            toggleEdit();
-            router.refresh();
+            if (!chapterId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const video = await updateChapter(chapterId, {
+                videoUrl: values.videoUrl,
+            });
+            if (video?.success) {
+                toast.success("Chapter updated successfully");
+                toggleEdit();
+            } else {
+                toast.error(video?.error || "Something went wrong");
+            }
+            // await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`,values);
+            // toast.success("chapter video uploaded successfully");
+            //toggleEdit();
+            // router.refresh();
         } catch (error) {
             toast.error("Something went wrong!");
         }
     };
+
+    console.log("videul", initialData.muxData?.playbackId);
 
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4 dark:bg-black">
@@ -69,7 +86,10 @@ const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVideoForm
                 ) : (
                     <div className="relative aspect-video mt-2">
                         <MuxPlayer
-                        playbackId={initialData?.muxData?.playbackId || ""}
+                            playbackId={
+                                initialData.muxData?.playbackId || ""
+                                // "wFxHcsUc02jF8jE7mNLXebL6sKPL9Oe026uLqs7uWzxuo"
+                            }
                         />
                     </div>
                 ))}
@@ -90,7 +110,8 @@ const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVideoForm
             )}
             {initialData && !isEditing && (
                 <div className="text-xs text-muted-foreground mt-2">
-                    Videos can take a few minutes to process. Refersh the page if video does not appear.
+                    Videos can take a few minutes to process. Refersh the page
+                    if video does not appear.
                 </div>
             )}
         </div>
