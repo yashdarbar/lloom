@@ -124,7 +124,7 @@ export async function getChapter(courseId: string, chapterId: string) {
                 error: "Unauthorized or missing chapter",
             };
         }
-        
+
         const getChapter = await db.chapter.findUnique({
             where: {
                 courseId: courseId,
@@ -333,6 +333,73 @@ export async function chapterUnpublish(chapterId: string, courseId: string) {
         console.log("[CHAPTER_UNPUBLISH]", error);
         return {
             error: "CHAPTER_UNPUBLISH_ERROR",
+        };
+    }
+}
+
+export async function deleteChapter(chapterId: string, courseId: string) {
+    try {
+        const { userId } = auth();
+
+        if (!userId || !chapterId) {
+            return {
+                error: "Unauthorized or missing course",
+            };
+        }
+
+        const courseOwner = await db.course.findUnique({
+            where: {
+                id: courseId,
+                userId: userId,
+            },
+        });
+
+        if (!courseOwner) {
+            return { error: "Course not found" };
+        }
+
+        const chapter = await db.chapter.findUnique({
+            where: {
+                id: chapterId,
+            },
+        });
+
+        if (!chapter) {
+            return { error: "Chapter not found" };
+        }
+
+        if (chapter.videoUrl) {
+            const existingMuxData = await db.muxData.findFirst({
+                where: {
+                    chapterId
+                }
+            });
+
+            if (existingMuxData) {
+                await video.assets.delete(existingMuxData.assetId);
+                await db.muxData.delete({
+                    where: {
+                        id: existingMuxData.id
+                    }
+                }
+                );
+            }
+        }
+
+        const deleteChapter = await db.chapter.delete({
+            where: {
+                id: chapterId,
+            },
+        });
+
+        return {
+            success: deleteChapter,
+        }
+
+    } catch (error) {
+        console.log("[CHAPTER_DELETE]", error);
+        return {
+            error: "CHAPTER_DELETE_ERROR",
         };
     }
 }

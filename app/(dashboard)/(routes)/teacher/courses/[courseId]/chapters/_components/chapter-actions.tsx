@@ -7,7 +7,7 @@ import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { chapterPublish, chapterUnpublish } from "../../../../actions/chapter-actions";
+import { chapterPublish, chapterUnpublish, deleteChapter } from "../../../../actions/chapter-actions";
 
 interface ChapterActionsProps {
     chapterId: string | undefined;
@@ -61,12 +61,16 @@ const ChapterActions = ({
     const onDelete = async () => {
         try {
             setIsLoading(true);
-            await axios.delete(
-                `/api/courses/${courseId}/chapters/${chapterId}`
-            );
-            toast.success("Chapter deleted");
-            router.refresh();
-            router.push(`/teacher/courses/${courseId}`);
+            if (!courseId || !chapterId) {
+                return "CourseId or chapterId not found"
+            }
+            const chapter = await deleteChapter(chapterId, courseId);
+            if (chapter.success) {
+                toast.success("Chapter deleted");
+            } else {
+                toast.error(chapter?.error || "Chapter is not deleted");
+            }
+            //router.push(`/teacher/courses/${courseId}`);
         } catch {
             toast.error("Something went wrong");
         } finally {
