@@ -371,18 +371,17 @@ export async function deleteChapter(chapterId: string, courseId: string) {
         if (chapter.videoUrl) {
             const existingMuxData = await db.muxData.findFirst({
                 where: {
-                    chapterId
-                }
+                    chapterId,
+                },
             });
 
             if (existingMuxData) {
                 await video.assets.delete(existingMuxData.assetId);
                 await db.muxData.delete({
                     where: {
-                        id: existingMuxData.id
-                    }
-                }
-                );
+                        id: existingMuxData.id,
+                    },
+                });
             }
         }
 
@@ -394,8 +393,7 @@ export async function deleteChapter(chapterId: string, courseId: string) {
 
         return {
             success: deleteChapter,
-        }
-
+        };
     } catch (error) {
         console.log("[CHAPTER_DELETE]", error);
         return {

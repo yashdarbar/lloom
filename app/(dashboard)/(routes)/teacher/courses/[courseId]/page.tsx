@@ -67,11 +67,11 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                             Complete all fields {completedText}
                         </span>
                     </div>
-                    {/* <CourseActions
-                        courseId={params.courseId}
+                    <CourseActions
+                        courseId={course.id}
                         disabled={!isCompleteFields}
                         isPublished={course.isPublished}
-                    /> */}
+                    />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-14">
                     <div>

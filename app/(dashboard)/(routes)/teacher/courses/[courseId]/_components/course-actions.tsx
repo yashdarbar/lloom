@@ -2,7 +2,7 @@
 
 import ConfirmModel from "@/components/models/confirm-model";
 import { Button } from "@/components/ui/button";
-import { useConfettiStore } from "@/hooks/use-confetti";
+//import { useConfettiStore } from "@/hooks/use-confetti";
 import axios from "axios";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -10,9 +10,9 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 interface CourseActionsProps {
-    courseId: string;
+    courseId: string | undefined;
     disabled: boolean;
-    isPublished: boolean | null;
+    isPublished: boolean | null | undefined;
 }
 
 const CourseActions = ({
@@ -21,7 +21,7 @@ const CourseActions = ({
     disabled,
 }: CourseActionsProps) => {
     const router = useRouter();
-    const confetti = useConfettiStore();
+    //const confetti = useConfettiStore();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -39,7 +39,7 @@ const CourseActions = ({
                     `/api/courses/${courseId}/publish`
                 );
                 toast.success("Course is Published");
-                confetti.onOpen();
+                //confetti.onOpen();
             }
 
             router.refresh();
