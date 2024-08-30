@@ -1,6 +1,6 @@
 "use client";
 
-import { Chapter } from "@prisma/client";
+import { Chapter } from "@/prisma/src/app/generated/client";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";

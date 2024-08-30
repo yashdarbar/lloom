@@ -20,7 +20,6 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { updateCourse } from "../../../actions/create-actions";
-import { Course } from "@prisma/client";
 import { CourseData } from "@/app/type/course";
 
 interface DescriptionFormProps {

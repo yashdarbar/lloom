@@ -15,7 +15,7 @@ import {
     deleteAttachment,
     getCourse,
 } from "../../../actions/create-actions";
-import { Attachment } from "@prisma/client";
+import { Attachment } from "@/prisma/src/app/generated/client";
 
 interface AttachmentFormProps {
     initialData: CourseData;

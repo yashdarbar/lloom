@@ -18,7 +18,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Chapter, Course } from "@prisma/client";;
 import { Editor } from "@/components/editor";
 import { Preview } from "@/components/preview";
 import { ChapterData } from "@/app/type/course";
