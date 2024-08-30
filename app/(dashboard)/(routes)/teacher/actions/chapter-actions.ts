@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import Mux from "@mux/mux-node";
 import { auth } from "@clerk/nextjs/server";
-import { Chapter } from "@prisma/client";
+import { Chapter } from "@/prisma/src/app/generated/client";
 import { revalidatePath } from "next/cache";
 
 //type ChapterProps = Chapter

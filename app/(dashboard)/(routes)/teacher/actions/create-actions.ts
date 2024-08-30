@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { Attachment, Course } from "@prisma/client";
+import { Attachment, Course } from "@/prisma/src/app/generated/client";
 import { revalidatePath } from "next/cache";
 
 type CourseProps = Course & Attachment[] & {
