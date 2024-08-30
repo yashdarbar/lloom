@@ -12,7 +12,7 @@ import AttachmentForm from "./_components/attachment-form";
 import ChapterForm from "./_components/chapter-form";
 import CourseActions from "./_components/course-actions";
 import { getCategory, getCourse } from "../../actions/create-actions";
-import { Attachment, Chapter, Course } from "@prisma/client";
+import { Attachment, Chapter, Course } from "@/prisma/src/app/generated/client";
 import Banner from "@/components/banner";
 //import Banner from "@/components/banner";
 
