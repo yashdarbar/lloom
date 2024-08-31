@@ -1,7 +1,8 @@
 "use server";
 
-import { db } from "@/lib/db";
+//import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 import { Attachment, Course } from "@/prisma/src/app/generated/client";
 import { revalidatePath } from "next/cache";
 
@@ -21,7 +22,7 @@ export async function createCourse(values: Partial<Course>) {
             return { error: "Unauthorized or missing title" };
         }
 
-        const courseTitle = await db.course.create({
+        const courseTitle = await prisma.course.create({
             data: {
                 userId,
                 title: values.title,
@@ -50,7 +51,7 @@ export async function getCourse(courseId: string) {
             };
         }
 
-        const course = await db.course.findUnique({
+        const course = await prisma.course.findUnique({
             where: {
                 userId,
                 id: courseId,
@@ -82,7 +83,7 @@ export async function updateCourse(courseId: string, values: Partial<Course>) {
             };
         }
 
-        const updateCourse = await db.course.update({
+        const updateCourse = await prisma.course.update({
             where: {
                 id: courseId,
                 userId,
@@ -109,7 +110,7 @@ export async function updateCourse(courseId: string, values: Partial<Course>) {
 
 export async function getCategory() {
     try {
-        const category = await db.category.findMany({
+        const category = await prisma.category.findMany({
             orderBy: {
                 name: "asc",
             },
@@ -135,7 +136,7 @@ export async function createAttachment(courseId: string, values: { url: string})
 
         const fileName = values.url.split("/").pop() || "unNamed_file";
 
-        const attachment = await db.attachment.create({
+        const attachment = await prisma.attachment.create({
             data: {
                 url: values.url,
                 name: fileName,
@@ -161,7 +162,7 @@ export async function deleteAttachment(courseId: string, attachmentId: string) {
             }
         }
 
-        const attachment = await db.attachment.delete({
+        const attachment = await prisma.attachment.delete({
             where: {
                 courseId: courseId,
                 id: attachmentId,
