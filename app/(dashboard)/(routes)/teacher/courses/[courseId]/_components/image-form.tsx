@@ -15,11 +15,10 @@ import { FileUpload } from "@/components/file-upload";
 import { updateCourse } from "../../../actions/create-actions";
 
 interface ImageFormProps {
-    initialData:
-        | {
-              imageUrl?: string | null;
-              id?: string;
-          }
+    initialData: {
+                imageUrl?: string | null;
+                id?: string;
+            }
         | null
         | undefined;
     courseId: string | undefined;

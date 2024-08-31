@@ -15,7 +15,7 @@ import {
     deleteAttachment,
     getCourse,
 } from "../../../actions/create-actions";
-import { Attachment } from "@/prisma/src/app/generated/client";
+//import { Attachment } from "@/prisma/src/app/generated/client";
 
 interface AttachmentFormProps {
     initialData: CourseData;
@@ -80,7 +80,7 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
                 toast.success("Course updated successfully");
                 setAttachments((prev) => [
                     ...prev,
-                    attachment.success as Attachment,
+                    attachment.success as AttachmentData,
                 ]);
                 toggleEdit();
             } else {

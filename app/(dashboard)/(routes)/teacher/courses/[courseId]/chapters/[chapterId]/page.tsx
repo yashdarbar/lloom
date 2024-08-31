@@ -12,7 +12,7 @@ import { redirect } from "next/navigation";
 
 import Link from "next/link";
 import { getChapter } from "../../../../actions/chapter-actions";
-import { ChapterData } from "@/app/type/course";
+import { ChapterData, MuxDataType } from "@/app/type/course";
 import { ChapterTitleForm } from "../_components/chapter-title-form";
 import ChapterDescriptionForm from "../_components/chapter-description-form";
 import ChapterAccessForm from "../_components/chapter-access-form";
@@ -31,16 +31,43 @@ const ChapterId = async ({
         return redirect("/");
     }
 
+    // const chapterResult = await getChapter(params.courseId, params.chapterId);
+    // if (!chapterResult || chapterResult.error) {
+    //     return <div>Course not found</div>;
+    // }
+
+    // const chapter: ChapterData = chapterResult.success || {};
+
+    // if (!chapter) {
+    //     return redirect("/");
+    // }
     const chapterResult = await getChapter(params.courseId, params.chapterId);
-    if (!chapterResult || chapterResult.error) {
-        return <div>Course not found</div>;
+    if (!chapterResult || chapterResult.error || !chapterResult.success) {
+        return <div>Chapter not found</div>;
     }
 
-    const chapter: ChapterData = chapterResult.success || {};
+    const chapterData = chapterResult.success;
 
-    if (!chapter) {
-        return redirect("/");
+    // Ensure all required properties are present
+    if (!chapterData.id || !chapterData.title || !chapterData.courseId) {
+        return <div>Invalid chapter data</div>;
     }
+
+    const chapter = {
+        id: chapterData.id,
+        title: chapterData.title,
+        description: chapterData.description || null,
+        videoUrl: chapterData.videoUrl || null,
+        position: chapterData.position,
+        isPublished: chapterData.isPublished || false,
+        isFree: chapterData.isFree || false,
+        courseId: chapterData.courseId,
+        createdAt: chapterData.createdAt || new Date(),
+        updatedAt: chapterData.updatedAt || new Date(),
+        muxData: chapterData.muxData || null,
+    };
+
+    //const muxData: MuxDataType | null = chapterResult.success.muxData || null;
 
     const requiredFields = [
         chapter.title,

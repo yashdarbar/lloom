@@ -3,10 +3,11 @@
 //import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { Attachment, Course } from "@/prisma/src/app/generated/client";
+//import { Attachment, Course } from "@/prisma/src/app/generated/client";
 import { revalidatePath } from "next/cache";
+import { AttachmentData, CourseData } from "@/app/type/course";
 
-type CourseProps = Course & Attachment[] & {
+type CourseProps = CourseData & AttachmentData[] & {
     courseId: string | undefined;
     title?: string | undefined;
     description?: string | null;
@@ -15,7 +16,7 @@ type CourseProps = Course & Attachment[] & {
     price?: string | null;
 };
 
-export async function createCourse(values: Partial<Course>) {
+export async function createCourse(values: Partial<CourseData>) {
     try {
         const { userId } = auth();
         if (!userId || !values.title) {
@@ -73,7 +74,7 @@ export async function getCourse(courseId: string) {
     }
 }
 
-export async function updateCourse(courseId: string, values: Partial<Course>) {
+export async function updateCourse(courseId: string, values: Partial<CourseData>) {
     try {
         const { userId } = auth();
 

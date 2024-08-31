@@ -4,7 +4,8 @@
 import { prisma } from "@/lib/prisma";
 import Mux from "@mux/mux-node";
 import { auth } from "@clerk/nextjs/server";
-import { Chapter } from "@/prisma/src/app/generated/client";
+//import { Chapter } from "@/prisma/src/app/generated/client";
+import { ChapterData } from "@/app/type/course";
 import { revalidatePath } from "next/cache";
 
 //type ChapterProps = Chapter
@@ -25,7 +26,7 @@ const { video } = new Mux({
 
 export async function createChapter(
     courseId: string,
-    values: Partial<Chapter>
+    values: Partial<ChapterData>
 ) {
     try {
         const { userId } = auth();
@@ -55,7 +56,7 @@ export async function createChapter(
             orderBy: {
                 position: "desc",
             },
-        })) as Chapter | null;
+        })) as ChapterData | null;
 
         const newPosition = lastChapter ? lastChapter.position + 1 : 1;
 
@@ -150,7 +151,7 @@ export async function getChapter(courseId: string, chapterId: string) {
 
 export async function updateChapter(
     chapterId: string,
-    values: Partial<Chapter>
+    values: Partial<ChapterData>
 ) {
     try {
         const { userId } = auth();

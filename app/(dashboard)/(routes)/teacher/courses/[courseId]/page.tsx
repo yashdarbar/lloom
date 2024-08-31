@@ -12,25 +12,50 @@ import AttachmentForm from "./_components/attachment-form";
 import ChapterForm from "./_components/chapter-form";
 import CourseActions from "./_components/course-actions";
 import { getCategory, getCourse } from "../../actions/create-actions";
-import { Attachment, Chapter, Course } from "@/prisma/src/app/generated/client";
+//import { Attachment, Chapter, Course } from "@/prisma/src/app/generated/client";
 import Banner from "@/components/banner";
+import { AttachmentData, ChapterData, CourseData } from "@/app/type/course";
 //import Banner from "@/components/banner";
 
-interface CourseData extends Partial<Course> {
-    id?: string;
-    attachments?: Attachment[];
-    chapters?: Chapter[];
+// interface Course extends Partial<CourseData> {
+//     id: string;
+//     attachments?: AttachmentData[];
+//     chapters?: ChapterData[];
+// }
+interface Course extends CourseData {
+    attachments: AttachmentData[];
+    chapters: ChapterData[];
 }
+
 
 const CourseId = async ({ params }: { params: { courseId: string } }) => {
     const courseResult = await getCourse(params.courseId);
-    if (!courseResult || courseResult.error) {
+    if (!courseResult || courseResult.error || !courseResult.success) {
         return <div>Course not found</div>;
     }
 
-    const course: CourseData = courseResult.success || {};
-    course.attachments = course.attachments || [];
-    course.chapters = course.chapters || [];
+    // const course: Course = courseResult.success || {};
+    // course.attachments = course.attachments || [];
+    // course.chapters = course.chapters || [];
+    const courseData = courseResult.success;
+
+    // Ensure all required properties are present
+    if (!courseData.id || !courseData.userId || !courseData.title) {
+        return <div>Invalid course data</div>;
+    }
+
+    const course: Course = {
+        ...courseData,
+        attachments: courseData.attachments || [],
+        chapters: courseData.chapters || [],
+        description: courseData.description || null,
+        imageUrl: courseData.imageUrl || null,
+        price: courseData.price || null,
+        isPublished: courseData.isPublished || false,
+        categoryId: courseData.categoryId || null,
+        createdAt: courseData.createdAt || new Date(),
+        updatedAt: courseData.updatedAt || new Date(),
+    };
 
     const categories = await getCategory();
     if (!categories || categories.error) {
