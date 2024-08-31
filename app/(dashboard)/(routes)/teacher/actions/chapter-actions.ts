@@ -1,6 +1,7 @@
 "use server";
 
-import { db } from "@/lib/db";
+//import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import Mux from "@mux/mux-node";
 import { auth } from "@clerk/nextjs/server";
 import { Chapter } from "@/prisma/src/app/generated/client";
@@ -34,7 +35,7 @@ export async function createChapter(
             };
         }
 
-        const courseOwner = db.course.findUnique({
+        const courseOwner = prisma.course.findUnique({
             where: {
                 id: courseId,
                 userId: userId,
@@ -47,7 +48,7 @@ export async function createChapter(
             };
         }
 
-        const lastChapter = (await db.chapter.findFirst({
+        const lastChapter = (await prisma.chapter.findFirst({
             where: {
                 courseId: courseId,
             },
@@ -58,7 +59,7 @@ export async function createChapter(
 
         const newPosition = lastChapter ? lastChapter.position + 1 : 1;
 
-        const chapter = await db.chapter.create({
+        const chapter = await prisma.chapter.create({
             data: {
                 title: values.title,
                 courseId: courseId,
@@ -87,7 +88,7 @@ export async function reorderChapters({
             return { error: "Unauthorized" };
         }
 
-        const courseOwner = await db.course.findUnique({
+        const courseOwner = await prisma.course.findUnique({
             where: {
                 id: courseId,
                 userId: userId,
@@ -99,7 +100,7 @@ export async function reorderChapters({
         }
 
         for (let item of list) {
-            await db.chapter.update({
+            await prisma.chapter.update({
                 where: {
                     id: item.id,
                 },
@@ -125,7 +126,7 @@ export async function getChapter(courseId: string, chapterId: string) {
             };
         }
 
-        const getChapter = await db.chapter.findUnique({
+        const getChapter = await prisma.chapter.findUnique({
             where: {
                 courseId: courseId,
                 id: chapterId,
@@ -160,7 +161,7 @@ export async function updateChapter(
             };
         }
 
-        const updateChapter = await db.chapter.update({
+        const updateChapter = await prisma.chapter.update({
             where: {
                 id: chapterId,
                 courseId: values.courseId,
@@ -171,7 +172,7 @@ export async function updateChapter(
         });
 
         if (values.videoUrl) {
-            const existingMuxData = await db.muxData.findFirst({
+            const existingMuxData = await prisma.muxData.findFirst({
                 where: {
                     chapterId: chapterId,
                 },
@@ -179,7 +180,7 @@ export async function updateChapter(
 
             if (existingMuxData) {
                 await video.assets.delete(existingMuxData.assetId);
-                await db.muxData.delete({
+                await prisma.muxData.delete({
                     where: {
                         id: existingMuxData.id,
                     },
@@ -191,7 +192,7 @@ export async function updateChapter(
                 playback_policy: ["public"],
             });
 
-            await db.muxData.create({
+            await prisma.muxData.create({
                 data: {
                     assetId: asset.id,
                     chapterId: chapterId,
@@ -220,7 +221,7 @@ export async function chapterPublish(chapterId: string, courseId: string) {
             };
         }
 
-        const courseOwner = await db.course.findUnique({
+        const courseOwner = await prisma.course.findUnique({
             where: {
                 id: courseId,
                 userId: userId,
@@ -231,14 +232,14 @@ export async function chapterPublish(chapterId: string, courseId: string) {
             return { error: "Unauthorized" };
         }
 
-        const chapter = await db.chapter.findUnique({
+        const chapter = await prisma.chapter.findUnique({
             where: {
                 id: chapterId,
                 courseId,
             },
         });
 
-        const muxData = await db.muxData.findUnique({
+        const muxData = await prisma.muxData.findUnique({
             where: {
                 chapterId,
             },
@@ -256,7 +257,7 @@ export async function chapterPublish(chapterId: string, courseId: string) {
             };
         }
 
-        const publishedChapter = await db.chapter.update({
+        const publishedChapter = await prisma.chapter.update({
             where: {
                 id: chapterId,
                 courseId,
@@ -287,7 +288,7 @@ export async function chapterUnpublish(chapterId: string, courseId: string) {
             };
         }
 
-        const courseOwner = await db.course.findUnique({
+        const courseOwner = await prisma.course.findUnique({
             where: {
                 id: courseId,
                 userId: userId,
@@ -298,7 +299,7 @@ export async function chapterUnpublish(chapterId: string, courseId: string) {
             return { error: "Course not found" };
         }
 
-        const unpublishedChapter = await db.chapter.update({
+        const unpublishedChapter = await prisma.chapter.update({
             where: {
                 id: chapterId,
                 courseId,
@@ -308,7 +309,7 @@ export async function chapterUnpublish(chapterId: string, courseId: string) {
             },
         });
 
-        const publishedChaptersInCourse = await db.chapter.findMany({
+        const publishedChaptersInCourse = await prisma.chapter.findMany({
             where: {
                 courseId,
                 isPublished: true,
@@ -316,7 +317,7 @@ export async function chapterUnpublish(chapterId: string, courseId: string) {
         });
 
         if (!publishedChaptersInCourse.length) {
-            await db.course.update({
+            await prisma.course.update({
                 where: {
                     id: courseId,
                 },
@@ -347,7 +348,7 @@ export async function deleteChapter(chapterId: string, courseId: string) {
             };
         }
 
-        const courseOwner = await db.course.findUnique({
+        const courseOwner = await prisma.course.findUnique({
             where: {
                 id: courseId,
                 userId: userId,
@@ -358,7 +359,7 @@ export async function deleteChapter(chapterId: string, courseId: string) {
             return { error: "Course not found" };
         }
 
-        const chapter = await db.chapter.findUnique({
+        const chapter = await prisma.chapter.findUnique({
             where: {
                 id: chapterId,
             },
@@ -369,7 +370,7 @@ export async function deleteChapter(chapterId: string, courseId: string) {
         }
 
         if (chapter.videoUrl) {
-            const existingMuxData = await db.muxData.findFirst({
+            const existingMuxData = await prisma.muxData.findFirst({
                 where: {
                     chapterId,
                 },
@@ -377,7 +378,7 @@ export async function deleteChapter(chapterId: string, courseId: string) {
 
             if (existingMuxData) {
                 await video.assets.delete(existingMuxData.assetId);
-                await db.muxData.delete({
+                await prisma.muxData.delete({
                     where: {
                         id: existingMuxData.id,
                     },
@@ -385,7 +386,7 @@ export async function deleteChapter(chapterId: string, courseId: string) {
             }
         }
 
-        const deleteChapter = await db.chapter.delete({
+        const deleteChapter = await prisma.chapter.delete({
             where: {
                 id: chapterId,
             },
