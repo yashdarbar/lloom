@@ -27,6 +27,11 @@ interface Course extends CourseData {
     chapters: ChapterData[];
 }
 
+interface Category {
+    id: string;
+    name: string;
+}
+
 
 const CourseId = async ({ params }: { params: { courseId: string } }) => {
     const courseResult = await getCourse(params.courseId);
@@ -113,10 +118,10 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                         <CategoryForm
                             initialData={course}
                             courseId={course.id}
-                            options={categories?.success?.map((category) => ({
+                            options={categories?.success?.map((category: Category) => ({
                                 label: category.name,
                                 value: category.id,
-                            }))}
+                            })) || []}
                         />
                     </div>
                     <div className="space-y-6">
