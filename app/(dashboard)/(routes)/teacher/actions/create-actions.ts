@@ -1,6 +1,7 @@
 "use server";
 
-import { db } from "@/lib/db";
+//import { db } from "@/lib/db";
+import { PrismaClient } from "@/prisma/src/app/generated/client";
 import { auth } from "@clerk/nextjs/server";
 //import { prisma } from "@/lib/prisma";
 //import { Attachment, Course } from "@/prisma/src/app/generated/client";
@@ -15,6 +16,8 @@ type CourseProps = CourseData & AttachmentData[] & {
     categoryId?: string | null;
     price?: string | null;
 };
+
+const db = new PrismaClient();
 
 export async function createCourse(values: Partial<CourseData>) {
     try {
