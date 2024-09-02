@@ -1,6 +1,6 @@
 "use client";
 
-import { Chapter } from "@/prisma/src/app/generated/client";
+//import { Chapter } from "@/prisma/src/app/generated/client";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -12,11 +12,12 @@ import {
 } from "@hello-pangea/dnd";
 import { Grip, Pencil } from "lucide-react";
 import Link from "next/link";
+import { ChapterData } from "@/app/type/course";
 
 interface ChaptersListProps {
     onEdit: (id: string) => string;
     onReorder: (updateData: { id: string; position: number }[]) => void;
-    items: Chapter[];
+    items: ChapterData[];
 }
 
 const ChaptersList = ({ onEdit, onReorder, items }: ChaptersListProps) => {

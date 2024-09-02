@@ -1,5 +1,5 @@
-import { Attachment } from "@/prisma/src/app/generated/client";
-import { Chapter, Course, MuxData } from "@/prisma/src/app/generated/client";
+import { Attachment } from "@/src/generated/client";
+import { Chapter, Course, MuxData } from "@/src/generated/client";
 // import { Attachment } from "@prisma/client";
 // import { Chapter, Course, MuxData } from "@prisma/client";
 
