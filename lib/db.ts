@@ -17,7 +17,7 @@
 
 // export const db = prisma;
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/src/generated/client";
 
 declare global {
     var cachedPrisma: PrismaClient;
