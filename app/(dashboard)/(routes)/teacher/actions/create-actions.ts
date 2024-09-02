@@ -1,7 +1,7 @@
 "use server";
 
 //import { db } from "@/lib/db";
-import { PrismaClient } from "@/prisma/src/app/generated/client";
+import { PrismaClient } from "@/src/generated/client";
 import { auth } from "@clerk/nextjs/server";
 //import { prisma } from "@/lib/prisma";
 //import { Attachment, Course } from "@/prisma/src/app/generated/client";
