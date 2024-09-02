@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 // import { PrismaClient } from "@/prisma/src/app/generated/client";
 // //import { PrismaClient } from "@prisma/client";
