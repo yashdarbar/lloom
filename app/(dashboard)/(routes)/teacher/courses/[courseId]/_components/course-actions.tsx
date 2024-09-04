@@ -8,6 +8,7 @@ import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { coursePublish, courseUnpublish } from "../../../actions/create-actions";
 
 interface CourseActionsProps {
     courseId: string | undefined;
@@ -28,21 +29,25 @@ const CourseActions = ({
     const onClick = async () => {
         try {
             setIsLoading(true);
+            if (!courseId) {
+                return "CourseId or chapterId not found";
+            }
             if (isPublished) {
-                await axios.patch(
-                    `/api/courses/${courseId}/unpublish`
-                );
-                toast.success("Course is Unpublished");
+                const unpublish = await courseUnpublish(courseId);
+                if (unpublish?.success) {
+                    toast.success("Course is Unpublished");
+                } else {
+                    toast.error(unpublish?.error || "Something went wrong");
+                }
             }
             if (!isPublished) {
-                await axios.patch(
-                    `/api/courses/${courseId}/publish`
-                );
-                toast.success("Course is Published");
-                //confetti.onOpen();
+                const publish = await coursePublish(courseId);
+                if (publish?.success) {
+                    toast.success("Course is Published");
+                } else {
+                    toast.error(publish?.error || "Something went wrong");
+                }
             }
-
-            router.refresh();
         } catch {
             toast.error("Something went wrong");
         } finally {

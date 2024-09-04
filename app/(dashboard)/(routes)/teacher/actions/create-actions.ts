@@ -8,14 +8,15 @@ import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { AttachmentData, CourseData } from "@/app/type/course";
 
-type CourseProps = CourseData & AttachmentData[] & {
-    courseId: string | undefined;
-    title?: string | undefined;
-    description?: string | null;
-    imageUrl?: string | null;
-    categoryId?: string | null;
-    price?: string | null;
-};
+type CourseProps = CourseData &
+    AttachmentData[] & {
+        courseId: string | undefined;
+        title?: string | undefined;
+        description?: string | null;
+        imageUrl?: string | null;
+        categoryId?: string | null;
+        price?: string | null;
+    };
 
 const db = new PrismaClient();
 
@@ -63,7 +64,7 @@ export async function getCourse(courseId: string) {
             include: {
                 attachments: true,
                 chapters: true,
-            }
+            },
         });
         //revalidatePath(`/teacher/courses/${courseId}`);
         return {
@@ -77,7 +78,10 @@ export async function getCourse(courseId: string) {
     }
 }
 
-export async function updateCourse(courseId: string, values: Partial<CourseData>) {
+export async function updateCourse(
+    courseId: string,
+    values: Partial<CourseData>
+) {
     try {
         const { userId } = auth();
 
@@ -101,6 +105,7 @@ export async function updateCourse(courseId: string, values: Partial<CourseData>
             },
         });
 
+        revalidatePath(`/courses/${courseId}`);
         return {
             success: updateCourse,
         };
@@ -130,7 +135,10 @@ export async function getCategory() {
     }
 }
 
-export async function createAttachment(courseId: string, values: { url: string}) {
+export async function createAttachment(
+    courseId: string,
+    values: { url: string }
+) {
     try {
         if (!values || !courseId) {
             return {
@@ -163,25 +171,134 @@ export async function deleteAttachment(courseId: string, attachmentId: string) {
         if (!courseId || !attachmentId) {
             return {
                 error: "missing attachmentId or Course",
-            }
+            };
         }
 
         const attachment = await db.attachment.delete({
             where: {
                 courseId: courseId,
                 id: attachmentId,
-            }
-        })
+            },
+        });
 
         return {
             success: attachment,
         };
-
     } catch (error) {
         console.log("[DELETE_ATTACHMENT_ERROR]", error);
         return {
             error: "DELETE_ATTACHMENT_ERROR",
         };
     }
+}
 
+export async function coursePublish(courseId: string) {
+    try {
+        const { userId } = auth();
+
+        if (!userId) {
+            return {
+                error: "Unauthorized or missing course",
+            };
+        }
+
+        const course = await db.course.findUnique({
+            where: {
+                userId,
+                id: courseId,
+            },
+            include: {
+                chapters: {
+                    include: {
+                        muxData: true,
+                    },
+                },
+            },
+        });
+
+        if (!course) {
+            return {
+                error: "Course not found",
+            };
+        }
+
+        const hasPublishedChapter = course.chapters.some(
+            (chapter) => chapter.isPublished
+        );
+
+        if (
+            !course.title ||
+            !course.description ||
+            !course.imageUrl ||
+            !course.categoryId ||
+            !hasPublishedChapter
+        ) {
+            return {
+                error: "Missing required fields",
+            };
+        }
+
+        const publishedCourse = await db.course.update({
+            where: {
+                id: courseId,
+                userId,
+            },
+            data: {
+                isPublished: true,
+            },
+        });
+
+        return {
+            success: publishedCourse,
+        };
+    } catch (error) {
+        console.log("[COURSE_PUBLISH]", error);
+        return {
+            error: "COURSE_PUBLISH_ERROR",
+        };
+    }
+}
+
+export async function courseUnpublish(courseId: string) {
+    try {
+        const { userId } = auth();
+
+        if (!userId) {
+            return {
+                error: "Unauthorized or missing course",
+            };
+        }
+
+        const course = await db.course.findUnique({
+            where: {
+                userId,
+                id: courseId,
+            },
+        });
+
+        if (!course) {
+            return {
+                error: "Course not found",
+            };
+        }
+
+        const unpublishedCourse = await db.course.update({
+            where: {
+                id: courseId,
+                userId: userId
+            },
+            data: {
+                isPublished: false,
+            }
+        });
+
+        return {
+            success: unpublishedCourse,
+        };
+    } catch (error) {
+        console.log("[COURSE_UNPUBLISH]", error);
+        return {
+            error: "COURSE_UNPUBLISH_ERROR",
+        };
+    }
 }
