@@ -8,7 +8,11 @@ import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { coursePublish, courseUnpublish } from "../../../actions/create-actions";
+import {
+    courseDelete,
+    coursePublish,
+    courseUnpublish,
+} from "../../../actions/create-actions";
 
 interface CourseActionsProps {
     courseId: string | undefined;
@@ -58,12 +62,16 @@ const CourseActions = ({
     const onDelete = async () => {
         try {
             setIsLoading(true);
-            await axios.delete(
-                `/api/courses/${courseId}`
-            );
-            toast.success("Course deleted");
-            router.refresh();
-            router.push(`/teacher/courses`);
+            if (!courseId) {
+                return "CourseId not found";
+            }
+            const course = await courseDelete(courseId);
+            if (course.success) {
+                toast.success("Course deleted");
+            } else {
+                toast.error(course?.error || "Chapter is not deleted");
+            }
+            //router.push(`/teacher/courses/${courseId}`);
         } catch {
             toast.error("Something went wrong");
         } finally {

@@ -7,6 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 //import { Attachment, Course } from "@/prisma/src/app/generated/client";
 import { revalidatePath } from "next/cache";
 import { AttachmentData, CourseData } from "@/app/type/course";
+import Mux from "@mux/mux-node";
 
 type CourseProps = CourseData &
     AttachmentData[] & {
@@ -19,6 +20,12 @@ type CourseProps = CourseData &
     };
 
 const db = new PrismaClient();
+
+const { video } = new Mux({
+    tokenId: "f1e4c75e-74eb-45d5-87d3-1019c9580a23", //process.env.MUX_TOKEN_ID as string,
+    tokenSecret:
+        "jaz3JnDGoaAaSz78iiW2N9l2u4ms2xpqu+I//WsDePBCajyU3MSL435anXRgfg9diZy2c2WQgIr", //process.env.MUX_TOKEN_SECRET as string,
+});
 
 export async function createCourse(values: Partial<CourseData>) {
     try {
@@ -299,6 +306,59 @@ export async function courseUnpublish(courseId: string) {
         console.log("[COURSE_UNPUBLISH]", error);
         return {
             error: "COURSE_UNPUBLISH_ERROR",
+        };
+    }
+}
+
+export async function courseDelete(courseId: string) {
+    try {
+        const { userId } = auth();
+
+        if (!userId) {
+            return {
+                error: "Unauthorized or missing course",
+            };
+        }
+
+        const course = await db.course.findUnique({
+            where: {
+                id: courseId,
+                userId: userId,
+            },
+            include: {
+                chapters: {
+                    include: {
+                        muxData: true,
+                    },
+                },
+            },
+        });
+
+        if (!course) {
+            return {error: "Course not"}
+        }
+
+        for (const chapter of course.chapters) {
+            if (chapter.muxData?.assetId) {
+                await video.assets.delete(chapter.muxData.assetId);
+            }
+        }
+
+        const deleteCourse = await db.course.delete({
+            where: {
+                id: courseId,
+                userId: userId,
+            },
+        });
+
+
+        return {
+            success: deleteCourse,
+        };
+    } catch (error) {
+        console.log("[COURSE_DELETE]", error);
+        return {
+            error: "COURSE_DELETE_ERROR",
         };
     }
 }
