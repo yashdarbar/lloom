@@ -2,7 +2,7 @@
 
 import ConfirmModel from "@/components/models/confirm-model";
 import { Button } from "@/components/ui/button";
-//import { useConfettiStore } from "@/hooks/use-confetti";
+import { useConfettiStore } from "@/hooks/use-confetti";
 import axios from "axios";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import {
     coursePublish,
     courseUnpublish,
 } from "../../../actions/create-actions";
+
 
 interface CourseActionsProps {
     courseId: string | undefined;
@@ -26,7 +27,7 @@ const CourseActions = ({
     disabled,
 }: CourseActionsProps) => {
     const router = useRouter();
-    //const confetti = useConfettiStore();
+    const confetti = useConfettiStore();
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -48,10 +49,13 @@ const CourseActions = ({
                 const publish = await coursePublish(courseId);
                 if (publish?.success) {
                     toast.success("Course is Published");
+
                 } else {
                     toast.error(publish?.error || "Something went wrong");
                 }
             }
+            confetti.onOpen();
+            //router.refresh();
         } catch {
             toast.error("Something went wrong");
         } finally {
