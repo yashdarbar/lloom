@@ -362,3 +362,24 @@ export async function courseDelete(courseId: string) {
         };
     }
 }
+
+export async function coursess(userId: string) {
+    try {
+        const coursesAll = await db.course.findMany({
+            where: {
+                userId,
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+        return {
+            success: coursesAll
+        }
+    } catch (error) {
+        console.log("[COURSES]", error);
+        return {
+            error: [],
+        };
+    }
+}
