@@ -15,8 +15,20 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { CourseData } from "@/app/type/course";
 
+interface Course {
+    id: string;
+    userId: string;
+    title: string;
+    description: string | null;
+    imageUrl: string | null;
+    price: number | null;
+    isPublished: boolean | null;
+    categoryId: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
-export const columns: ColumnDef<CourseData>[] = [
+export const columns: ColumnDef<Course>[] = [
     {
         accessorKey: "title",
         header: ({ column }) => {

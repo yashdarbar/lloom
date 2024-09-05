@@ -5,6 +5,7 @@ import { columns } from "./_components/columns";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { coursess } from "../actions/create-actions";
+import { CourseData } from "@/app/type/course";
 
 
 const Courses = async () => {
@@ -15,7 +16,8 @@ const Courses = async () => {
     }
 
     const coursesResponse = await coursess(userId);
-    const courses = "success" in coursesResponse ? coursesResponse.success : [];
+    //const courses = "success" in coursesResponse ? coursesResponse.success : [];
+    const courses: CourseData[] = "success" in coursesResponse && Array.isArray(coursesResponse.success) ? coursesResponse.success : [];
 
     return (
         <div className="dark:bg-black h-full">
