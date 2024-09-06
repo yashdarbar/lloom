@@ -35,7 +35,7 @@ const CategoryItem = ({ label, value, icon: Icon }: CategoryItemProps) => {
             { skipEmptyString: true, skipNull: true }
         );
 
-        //router.push(url);
+        router.push(url);
     };
 
     return (

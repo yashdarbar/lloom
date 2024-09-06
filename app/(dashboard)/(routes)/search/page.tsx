@@ -59,8 +59,8 @@ const SearchPage = ({ searchParams }: SearchPageProps) => {
 
     return (
         <>
-            <div className="md:hidden md:mb-0 block pt-2 px-6">
-                {/* <SearchInput /> */}
+            <div className="md:hidden md:mb-0 block pt-2 mt-4 px-6">
+                <SearchInput />
             </div>
             <div className="p-6 space-y-3">
                 <Categories items={categories?.success} />

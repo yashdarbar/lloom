@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
+import SearchInput from "./search-input";
 //import { ModeToggle } from "./themer-toggle";
 //import SearchInput from "./search-input";
 
@@ -19,9 +20,9 @@ const NavBarRoutes = () => {
     return (
         <>
             <div className="hidden md:block">
-                {/* {isSearchPage && (
+                {isSearchPage && (
                     <SearchInput />
-                )} */}
+                )}
             </div>
             <div className="flex ml-auto gap-x-2 dark:bg-black">
                 {/* <ModeToggle /> */}
