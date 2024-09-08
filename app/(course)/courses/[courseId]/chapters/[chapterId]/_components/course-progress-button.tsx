@@ -56,7 +56,7 @@ const CourseProgressButton = ({
             onClick={onClick}
             disabled={isLoading}
             type="button"
-            variant={isCompleted ? "outline" : "success"}
+            //variant={isCompleted ? "outline" : "success"}
             className="w-full md:w-auto"
         >
             {isCompleted ? "Not completed" : "Mart as complete"}

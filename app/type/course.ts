@@ -1,6 +1,6 @@
 // import { Attachment } from "@prisma/client";
 //import { Chapter, Course, MuxData } from "@/src/generated/client";
-import { Attachment, Category } from "@prisma/client";
+import { Attachment, Category, UserProgress } from "@prisma/client";
 import { Chapter, Course, MuxData } from "@prisma/client";
 
 export interface CourseData extends Partial<Course> {
@@ -48,4 +48,13 @@ export interface MuxDataType extends Partial<MuxData> {
 export interface CategoryData extends Partial<Category> {
     id: string;
     name: string;
+}
+
+export interface UserProgressData extends Partial<UserProgress> {
+    id: string;
+    userId: string;
+    chapterId: string;
+    isCompleted: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
