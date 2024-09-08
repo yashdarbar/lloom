@@ -1,14 +1,14 @@
 import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
-import { Chapter, Course, UserProgress } from "@/src/app/generated/client";
 import { redirect } from "next/navigation";
 import CoursesSideItem from "./courses-sideItem";
 import CourseProgress from "@/components/course-progress";
+import { ChapterData, CourseData, UserProgressData } from "@/app/type/course";
 
 interface CourseSideBarProps {
-    course: Course & {
-        chapters: (Chapter & {
-            userProgress: UserProgress[] | null;
+    course: CourseData & {
+        chapters: (ChapterData & {
+            userProgress: UserProgressData[] | null;
         })[];
     };
     progressCount: number;
