@@ -21,7 +21,7 @@ const Courses = async () => {
 
     return (
         <div className="dark:bg-black h-full">
-            <div className="p-6">
+            <div className="p-6 mt-5">
                 {/* <Link href="/teacher/create">
                     <Button>New Course</Button>
                 </Link> */}

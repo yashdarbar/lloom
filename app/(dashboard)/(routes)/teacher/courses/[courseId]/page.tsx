@@ -89,7 +89,7 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                     label="This Course is unpublised. To make is publised complete all the required fields."
                 />
             )}
-            <div className="p-6">
+            <div className="p-6 mt-8">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-y-2">
                         <h1 className="text-2xl font-medium">Course setup</h1>
