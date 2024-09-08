@@ -39,9 +39,9 @@ const CourseCard = ({
                             <span className="ml-1"> {chaptersLength} {chaptersLength === 1 ? "chapter": "chapters"}</span>
                         </div>
                     </div>
-                    {/* {progress !== null ? (
+                    {progress !== null ? (
                         <CourseProgress value={progress} variant={progress === 100 ? "success" : "default"} size="sm"/>
-                    ): (<p className="text-md md:text-sm text-slate-700">{formatPrice(price)}</p>)} */}
+                    ): (<p className="text-md md:text-sm text-slate-700">{formatPrice(price)}</p>)}
                 </div>
             </div>
         </Link>
