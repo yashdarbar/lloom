@@ -457,3 +457,49 @@ export async function chapterProgress(courseId: string, chapterId: string, isCom
         };
     }
 }
+
+export async function updateChapterProgress(
+    courseId: string,
+    chapterId: string,
+    isCompleted: boolean
+) {
+    try {
+        const { userId } = auth();
+
+        if (!userId) {
+            return {
+                error: "Unauthorized",
+            };
+        }
+
+        const userProgress = await db.userProgress.upsert({
+            where: {
+                userId_chapterId: {
+                    userId: userId,
+                    chapterId: chapterId,
+                },
+            },
+            update: {
+                isCompleted: isCompleted,
+            },
+            create: {
+                userId: userId,
+                chapterId: chapterId,
+                isCompleted,
+            },
+        });
+
+        revalidatePath(`/courses/${courseId}/chapters/${chapterId}`);
+
+        return {
+            success: true,
+            data: userProgress,
+        };
+
+    } catch (error) {
+        console.log("[UPDATE_CHAPTER_PROGRESS]", error);
+        return {
+            error: "UPDATE_CHAPTER_PROGRESS_ERROR",
+        }
+    }
+}
