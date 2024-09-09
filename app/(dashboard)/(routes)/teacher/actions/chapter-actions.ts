@@ -8,6 +8,7 @@ import { auth } from "@clerk/nextjs/server";
 import { ChapterData } from "@/app/type/course";
 import { revalidatePath } from "next/cache";
 
+
 //type ChapterProps = Chapter
 interface ReorderChaptersInput {
     courseId: string;
@@ -23,6 +24,7 @@ const { video } = new Mux({
 });
 
 //console.log("mmxx", video);
+
 
 export async function createChapter(
     courseId: string,
@@ -400,6 +402,58 @@ export async function deleteChapter(chapterId: string, courseId: string) {
         console.log("[CHAPTER_DELETE]", error);
         return {
             error: "CHAPTER_DELETE_ERROR",
+        };
+    }
+}
+
+// export async function progressE(courseId: string, chapterId: string) {
+//     try {
+//         const { userId } = auth();
+
+//     } catch (error) {
+//         console.log("[CHAPTER_PROGRESS]", error);
+//         return {
+//             error: "CHAPTER_PROGRESS_ERROR",
+//         }
+//     }
+// }
+
+export async function chapterProgress(courseId: string, chapterId: string, isCompleted: boolean) {
+    try {
+        const { userId } = auth();
+
+        if (!userId) {
+            return {
+                error: "Unauthorized",
+            }
+        }
+
+        const userProgress = await db.userProgress.upsert({
+            where: {
+                userId_chapterId: {
+                    userId: userId,
+                    chapterId: chapterId,
+                },
+            },
+            update: {
+                isCompleted: !isCompleted,
+            },
+            create: {
+                userId: userId,
+                chapterId: chapterId,
+                isCompleted,
+            },
+        });
+
+        revalidatePath(`/courses/${courseId}/chapters/${chapterId}`);
+
+        return {
+            success: true, data: userProgress,
+        }
+    } catch (error) {
+        console.log("[CHAPTER_PROGRESS]", error);
+        return {
+            error: "CHAPTER_PROGRESS_ERROR",
         };
     }
 }

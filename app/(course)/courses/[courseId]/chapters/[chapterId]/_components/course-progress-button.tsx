@@ -1,8 +1,8 @@
 "use client";
 
+import { chapterProgress } from "@/app/(dashboard)/(routes)/teacher/actions/chapter-actions";
 import { Button } from "@/components/ui/button";
 import { useConfettiStore } from "@/hooks/use-confetti";
-import axios from "axios";
 import { CheckCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -18,7 +18,7 @@ interface CourseProgressButtonProps {
 const CourseProgressButton = ({
     courseId,
     chapterId,
-    isCompleted,
+    isCompleted = false,
     nextChapterId,
 }: CourseProgressButtonProps) => {
     const Icon = isCompleted ? XCircle : CheckCircle;
@@ -30,25 +30,52 @@ const CourseProgressButton = ({
     const onClick = async () => {
         try {
             setIsLoading(true);
-            await axios.put(
-                `/api/courses/${courseId}/chapters/${chapterId}/progress`,
-                { isCompleted: !isCompleted }
+            const result = await chapterProgress(
+                courseId,
+                chapterId,
+                isCompleted
             );
-            if (!isCompleted && !nextChapterId) {
-                confetti.onOpen();
+
+            if (result.success) {
+                if (!isCompleted && !nextChapterId) {
+                    confetti.onOpen();
+                }
+                if (!isCompleted && nextChapterId) {
+                    router.push(
+                        `/courses/${courseId}/chapters/${nextChapterId}`
+                    );
+                }
+                toast.success("Progress updated");
+                //router.refresh();
+            } else {
+                throw new Error(result.error);
             }
-            if (!isCompleted && nextChapterId) {
-                router.push(
-                    `/api/courses/${courseId}/chapters/${nextChapterId}`
-                );
-            }
-            toast.success("Progress updated");
-            router.refresh();
         } catch (error) {
             toast.error("Something went wrong");
         } finally {
             setIsLoading(false);
         }
+        // try {
+        //     setIsLoading(true);
+        //     await axios.put(
+        //         `/api/courses/${courseId}/chapters/${chapterId}/progress`,
+        //         { isCompleted: !isCompleted }
+        //     );
+        //     if (!isCompleted && !nextChapterId) {
+        //         confetti.onOpen();
+        //     }
+        //     if (!isCompleted && nextChapterId) {
+        //         router.push(
+        //             `/api/courses/${courseId}/chapters/${nextChapterId}`
+        //         );
+        //     }
+        //     toast.success("Progress updated");
+        //     router.refresh();
+        // } catch (error) {
+        //     toast.error("Something went wrong");
+        // } finally {
+        //     setIsLoading(false);
+        // }
     };
 
     return (
@@ -56,7 +83,7 @@ const CourseProgressButton = ({
             onClick={onClick}
             disabled={isLoading}
             type="button"
-            //variant={isCompleted ? "outline" : "success"}
+            variant={isCompleted ? "outline" : "success"}
             className="w-full md:w-auto"
         >
             {isCompleted ? "Not completed" : "Mart as complete"}
