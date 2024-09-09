@@ -33,7 +33,8 @@ const VideoPlayer = ({
     const [isReady, setIsReady] = useState(false);
     const confetti = useConfettiStore();
 
-    //console.log("playbackId", playbackId);
+    console.log("playbackId", playbackId);
+    
 
     const onEnd = async () => {
         try {

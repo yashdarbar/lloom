@@ -1,9 +1,11 @@
 "use client";
 
+import { checkOut } from "@/app/(dashboard)/(routes)/teacher/actions/create-actions";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
 import axios from "axios";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface CourseEnrollButtonProps {
     courseId: string;
@@ -16,12 +18,21 @@ const CourseEnrollButton = ({ price, courseId }: CourseEnrollButtonProps) => {
     const onClick = async () => {
         try {
             setIsLoading(true);
-            const response = await axios.post(
-                `/api/courses/${courseId}/checkout`
-            );
-            window.location.assign(response.data.url);
+            if (!courseId) {
+                return {
+                    error: "Course not found",
+                };
+            }
+            const response = await checkOut(courseId);
+            if (response?.success) {
+                // toast.success("Chapter updated successfully");
+                // toggleEdit();
+                window.location.assign(response.success.url!);
+            } else {
+                toast.error(response?.error || "Something went wrong");
+            }
         } catch (error) {
-            console.log("Something went wrong", error);
+            toast.error("Something went wrong");
         } finally {
             setIsLoading(false);
         }
@@ -29,7 +40,12 @@ const CourseEnrollButton = ({ price, courseId }: CourseEnrollButtonProps) => {
 
     return (
         <>
-            <Button onClick={onClick} disabled={isLoading} size="sm" className="w-full md:w-auto">
+            <Button
+                onClick={onClick}
+                disabled={isLoading}
+                size="sm"
+                className="w-full md:w-auto"
+            >
                 Enroll for {formatPrice(price)}
             </Button>
         </>

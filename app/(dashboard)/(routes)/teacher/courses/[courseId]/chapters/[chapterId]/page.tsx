@@ -84,10 +84,15 @@ const ChapterId = async ({
 
     return (
         <>
-            {!chapter.isPublished &&
-            <Banner variant="warning" label="This chapter is unpublished. It will not be visible in the course"/>
-        }
-            <div className="p-6">
+            {!chapter.isPublished && (
+                <div className="mt-9">
+                    <Banner
+                        variant="warning"
+                        label="This chapter is unpublished. It will not be visible in the course"
+                    />
+                </div>
+            )}
+            <div className="p-6 mt-[35px]">
                 <div className="flex justify-between items-center">
                     <div className="w-full">
                         <Link
@@ -107,10 +112,10 @@ const ChapterId = async ({
                                 </span>
                             </div>
                             <ChapterActions
-                            disabled={!isCompleteFields}
-                            chapterId={chapter.id}
-                            courseId={chapter.courseId}
-                            isPublished={chapter.isPublished}
+                                disabled={!isCompleteFields}
+                                chapterId={chapter.id}
+                                courseId={chapter.courseId}
+                                isPublished={chapter.isPublished}
                             />
                         </div>
                     </div>

@@ -47,7 +47,7 @@ const ChapterAccessForm = ({ initialData, courseId, chapterId }: ChapterAccessFo
     const toggleEdit = () => setIsEditing((current) => !current);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        //console.log(values);
         try {
             if (!chapterId) {
                 return {

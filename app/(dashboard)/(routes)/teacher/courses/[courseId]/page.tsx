@@ -84,10 +84,12 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
     return (
         <>
             {!course.isPublished && (
-                <Banner
-                    variant="warning"
-                    label="This Course is unpublised. To make is publised complete all the required fields."
-                />
+                <div className="mt-9">
+                    <Banner
+                        variant="warning"
+                        label="This Course is unpublised. To make is publised complete all the required fields."
+                    />
+                </div>
             )}
             <div className="p-6 mt-8">
                 <div className="flex items-center justify-between">
@@ -118,10 +120,14 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
                         <CategoryForm
                             initialData={course}
                             courseId={course.id}
-                            options={categories?.success?.map((category: Category) => ({
-                                label: category.name,
-                                value: category.id,
-                            })) || []}
+                            options={
+                                categories?.success?.map(
+                                    (category: Category) => ({
+                                        label: category.name,
+                                        value: category.id,
+                                    })
+                                ) || []
+                            }
                         />
                     </div>
                     <div className="space-y-6">

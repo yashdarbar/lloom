@@ -2,12 +2,14 @@
 
 //import { db } from "@/lib/db";
 import { PrismaClient } from "@prisma/client";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 //import { prisma } from "@/lib/prisma";
 //import { Attachment, Course } from "@/prisma/src/app/generated/client";
 import { revalidatePath } from "next/cache";
 import { AttachmentData, CourseData } from "@/app/type/course";
 import Mux from "@mux/mux-node";
+import Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
 
 type CourseProps = CourseData &
     AttachmentData[] & {
@@ -381,5 +383,99 @@ export async function coursess(userId: string) {
         return {
             error: [],
         };
+    }
+}
+
+export async function checkOut(courseId: string) {
+    try {
+        const user = await currentUser();
+        if (!user || !user.emailAddresses?.[0]?.emailAddress || !user.id) {
+            return {
+                error: "Unauthorized",
+            }
+        }
+
+        const course = await db.course.findUnique({
+            where: {
+                id: courseId,
+                isPublished: true,
+            },
+        });
+
+        if (!course) {
+            return {
+                error: "Course not found",
+            }
+        }
+        const purchase = await db.purchase.findUnique({
+            where: {
+                userId_courseId: {
+                    userId: user.id,
+                    courseId: courseId
+                },
+            },
+        });
+
+        if (purchase) {
+            return { error: "Already purchased",}
+        }
+
+        const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+            {
+                quantity: 1,
+                price_data: {
+                    currency: "USD",
+                    unit_amount: Math.round(course.price!) * 100,
+                    product_data: {
+                        name: course.title,
+                        description: course.description!,
+                    },
+                },
+            },
+        ];
+
+        let stripeCustomer = await db.stripeCustomer.findUnique({
+            where: {
+                userId: user.id,
+            },
+            select: {
+                stripeCustomerId: true,
+            },
+        });
+
+        if (!stripeCustomer) {
+            const customer = await stripe.customers.create({
+                email: user.emailAddresses[0].emailAddress,
+            });
+
+            stripeCustomer = await db.stripeCustomer.create({
+                data: {
+                    userId: user.id,
+                    stripeCustomerId: customer.id,
+                },
+            });
+        }
+
+        const session = await stripe.checkout.sessions.create({
+            line_items,
+            mode: "payment",
+            customer: stripeCustomer.stripeCustomerId,
+            metadata: {
+                userId: user.id,
+                courseId: course.id,
+            },
+            success_url: `${process.env.NEXT_APP_URL}/courses/${course.id}?success=1`,
+            cancel_url: `${process.env.NEXT_APP_URL}/courses/${course.id}?cancel=1`,
+        });
+
+        return {
+            success: {url: session.url}
+        }
+
+    } catch (error) {
+        console.log("[COURSES_CHECKOUT]", error);
+        return {
+            error: "COURSES_CHECKOUT_ERROR",
+        }
     }
 }
