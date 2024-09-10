@@ -70,6 +70,8 @@ export async function createChapter(
             },
         });
 
+        revalidatePath(`/teacher/courses/${courseId}`)
+
         return {
             success: chapter,
         };

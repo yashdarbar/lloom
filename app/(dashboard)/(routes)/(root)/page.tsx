@@ -16,7 +16,10 @@ export default async function DashboardCourses() {
         userId
     );
 
+    //console.log("beer", coursesInProgress);
+
     return (
+
         <div className="p-6 space-y-4 mt-[35px]">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InfoCard

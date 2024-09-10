@@ -66,7 +66,7 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
     }, [courseId]);
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        //console.log(values);
         try {
             if (!courseId) {
                 return {
@@ -120,7 +120,7 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
     return (
         <div className="mt-6 border bg-slate-100 rounded-md p-4 dark:bg-black">
             <div className="font-medium flex items-center justify-between">
-                Course image
+                Course resoures
                 <Button variant="ghost" onClick={toggleEdit}>
                     {isEditing && <>Cancel</>}
                     {!isEditing && (

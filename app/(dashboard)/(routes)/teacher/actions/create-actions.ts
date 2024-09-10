@@ -114,7 +114,8 @@ export async function updateCourse(
             },
         });
 
-        revalidatePath(`/courses/${courseId}`);
+        revalidatePath(`/teacher/courses/${courseId}`);
+        
         return {
             success: updateCourse,
         };
@@ -164,6 +165,8 @@ export async function createAttachment(
                 courseId: courseId,
             },
         });
+
+        revalidatePath(`/teacher/courses/${courseId}`);
         return {
             success: attachment,
         };
