@@ -57,7 +57,7 @@ export function DataTable<TData, TValue>({
 
     return (
         <>
-            <div className="flex items-center py-4 justify-between">
+            <div className="flex items-center py-4 justify-between dark:bg-black">
                 <Input
                     placeholder="Filter courses..."
                     value={

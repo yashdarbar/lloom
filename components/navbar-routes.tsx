@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import SearchInput from "./search-input";
-//import { ModeToggle } from "./themer-toggle";
+import { ModeToggle } from "./mode-toggle";
 //import SearchInput from "./search-input";
 
 const NavBarRoutes = () => {
@@ -25,7 +25,7 @@ const NavBarRoutes = () => {
                 )}
             </div>
             <div className="flex ml-auto gap-x-2 dark:bg-black">
-                {/* <ModeToggle /> */}
+                <ModeToggle />
                 {isTeacherPage || isPlayerPage ? (
                     <Link href="/" className="mx-2">
                         <Button size="sm" variant={"ghost"}>

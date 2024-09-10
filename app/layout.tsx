@@ -9,6 +9,7 @@ import {
 } from "@clerk/nextjs";
 import "./globals.css";
 import ToasterProvider from "@/components/providers/toaster-provider";
+import { ThemeProvider } from "@/components/themer-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,11 +30,16 @@ export default function RootLayout({
                     <SignedOut>
                         <SignInButton />
                     </SignedOut>
-                    <SignedIn>
-                        {/* <UserButton /> */}
-                    </SignedIn>
-                    <ToasterProvider/>
-                    {children}
+                    <SignedIn>{/* <UserButton /> */}</SignedIn>
+                    <ToasterProvider />
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        {children}
+                    </ThemeProvider>
                 </body>
             </html>
         </ClerkProvider>
