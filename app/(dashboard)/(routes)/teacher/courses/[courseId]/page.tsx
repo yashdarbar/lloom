@@ -84,14 +84,14 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
     return (
         <>
             {!course.isPublished && (
-                <div className="">
+                <div className="mt-8">
                     <Banner
                         variant="warning"
                         label="This Course is unpublised. To make is publised complete all the required fields."
                     />
                 </div>
             )}
-            <div className="p-6 mt-[35px]">
+            <div className="p-6 mt-[30px]">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-y-2">
                         <h1 className="text-2xl font-medium">Course setup</h1>
