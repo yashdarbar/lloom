@@ -84,7 +84,7 @@ const CourseId = async ({ params }: { params: { courseId: string } }) => {
     return (
         <>
             {!course.isPublished && (
-                <div className="mt-9">
+                <div className="">
                     <Banner
                         variant="warning"
                         label="This Course is unpublised. To make is publised complete all the required fields."

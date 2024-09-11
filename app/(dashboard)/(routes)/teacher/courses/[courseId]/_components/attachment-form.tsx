@@ -83,6 +83,7 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
                     attachment.success as AttachmentData,
                 ]);
                 toggleEdit();
+                router.refresh();
             } else {
                 toast.error(attachment?.error || "Course not updated");
             }

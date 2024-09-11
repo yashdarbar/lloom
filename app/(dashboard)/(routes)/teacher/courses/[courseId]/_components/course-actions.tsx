@@ -55,7 +55,7 @@ const CourseActions = ({
                 }
             }
             confetti.onOpen();
-            //router.refresh();
+            router.refresh();
         } catch {
             toast.error("Something went wrong");
         } finally {

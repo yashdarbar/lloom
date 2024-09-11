@@ -61,9 +61,11 @@ const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
             const title = await updateCourse(courseId, {title: values.title});
             if (title?.success) {
                 toast.success("Course updated successfully")
+                router.refresh();
             } else {
                 toast.error(title?.error || "Something went wrong");
             }
+            //router.refresh();
         } catch (error) {
             toast.error("Something went wrong!");
         }

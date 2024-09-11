@@ -88,6 +88,7 @@ const ChapterForm = ({ initialData, courseId }: ChapterFormProps) => {
             if (chapter?.success) {
                 toast.success("Chapter updated successfully");
                 toggleCreating();
+                router.refresh();
             } else {
                 toast.error(chapter?.error || "Chapter not updated");
             }

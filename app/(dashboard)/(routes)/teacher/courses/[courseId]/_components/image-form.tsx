@@ -48,9 +48,11 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
             const imageUrl = await updateCourse(courseId, values);
             if (imageUrl?.success) {
                 toast.success("Image updated successfully");
+                router.refresh();
             } else {
                 toast.error(imageUrl.error || "Image not updated");
             }
+            //router.refresh();
         } catch (error) {
             toast.error("Something went wrong!");
         }

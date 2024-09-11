@@ -71,6 +71,7 @@ const CategoryForm = ({
             const categoryId = await updateCourse(courseId, values);
             if (categoryId?.success) {
                 toast.success("Course updated successfully");
+                router.refresh();
             } else {
                 toast.error(categoryId?.error || "Course not updated");
             }

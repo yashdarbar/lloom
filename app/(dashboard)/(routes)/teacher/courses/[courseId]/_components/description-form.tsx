@@ -61,9 +61,11 @@ const DescriptionForm = ({ initialData, courseId }: DescriptionFormProps) => {
             const description = await updateCourse(courseId, values);
             if (description?.success) {
                 toast.success("Course updated successfully");
+                router.refresh();
             } else {
                 toast.error(description?.error || "Course not updated");
             }
+            //router.refresh();
         } catch (error) {
             toast.error("Something went wrong!");
         }

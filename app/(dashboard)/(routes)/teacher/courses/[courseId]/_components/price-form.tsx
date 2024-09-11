@@ -49,7 +49,7 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
     const router = useRouter();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        //console.log(values);
         try {
             if (!courseId) {
                 return {
@@ -59,6 +59,7 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
             const price = await updateCourse(courseId, {price: values.price});
             if (price?.success) {
                 toast.success("Course updated successfully");
+                router.refresh();
             } else {
                 toast.error(price?.error || "Course not updated");
             }
