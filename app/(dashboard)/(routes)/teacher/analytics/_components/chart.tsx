@@ -18,7 +18,7 @@ interface ChartProps {
 }
 
 const Chart = ({ data }: ChartProps) => {
-    return <Card>
+    return <Card className="dark:bg-black">
         <ResponsiveContainer width="100%" height={350}>
             <BarChart data={data}>
                 <XAxis
