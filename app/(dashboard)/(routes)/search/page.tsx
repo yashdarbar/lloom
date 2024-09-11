@@ -42,7 +42,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <div className="md:hidden md:mb-0 block pt-2 mt-4 px-6">
                 <SearchInput />
             </div>
-            <div className="p-6 space-y-3 mt-2">
+            <div className="p-6 space-y-3 mt-6">
                 <Suspense fallback={<div>Loading categories...</div>}>
                     <Categories items={categories.success} />
                 </Suspense>

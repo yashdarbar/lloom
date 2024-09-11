@@ -52,7 +52,7 @@ const VideoPlayer = ({
                 router.refresh();
 
                 if (nextChapterId) {
-                    router.push(`/api/courses/${courseId}/chapters/${nextChapterId}`);
+                    router.push(`courses/${courseId}/chapters/${nextChapterId}`);
                 }
             }
         } catch (error) {
