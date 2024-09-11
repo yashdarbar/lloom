@@ -92,7 +92,7 @@ const ChapterId = async ({
                     />
                 </div>
             )}
-            <div className="p-6 ">
+            <div className="p-6 mt-[35px]">
                 <div className="flex justify-between items-center">
                     <div className="w-full">
                         <Link

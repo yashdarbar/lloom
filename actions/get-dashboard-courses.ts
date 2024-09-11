@@ -43,7 +43,7 @@ export async function getDashBoardCourses(userId: string): Promise<DashBoardCour
 
         const completedCourses = courses.filter((course)=> course.progress === 100);
         const coursesInProgress = courses.filter((course)=> (course.progress ?? 0) < 100);
-
+        //console.log("jfa", coursesInProgress);
         return {
             completedCourses,
             coursesInProgress,
