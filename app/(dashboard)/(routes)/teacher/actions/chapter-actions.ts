@@ -447,7 +447,7 @@ export async function chapterProgress(courseId: string, chapterId: string, isCom
             },
         });
 
-        revalidatePath(`/courses/${courseId}/chapters/${chapterId}`);
+        //revalidatePath(`/courses/${courseId}/chapters/${chapterId}`);
 
         return {
             success: true, data: userProgress,
@@ -491,7 +491,7 @@ export async function updateChapterProgress(
             },
         });
 
-        revalidatePath(`/courses/${courseId}/chapters/${chapterId}`);
+        //revalidatePath(`/courses/${courseId}/chapters/${chapterId}`);
 
         return {
             success: true,
