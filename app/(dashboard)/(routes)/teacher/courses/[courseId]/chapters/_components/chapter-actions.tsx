@@ -70,7 +70,7 @@ const ChapterActions = ({
             } else {
                 toast.error(chapter?.error || "Chapter is not deleted");
             }
-            //router.push(`/teacher/courses/${courseId}`);
+            router.push(`/teacher/courses/${courseId}`);
         } catch {
             toast.error("Something went wrong");
         } finally {

@@ -49,7 +49,7 @@ const VideoPlayer = ({
                 }
 
                 toast.success("Progress updated");
-                //router.refresh();
+                router.refresh();
 
                 if (nextChapterId) {
                     router.push(`/api/courses/${courseId}/chapters/${nextChapterId}`);

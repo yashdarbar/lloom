@@ -46,7 +46,7 @@ const CourseProgressButton = ({
                     );
                 }
                 toast.success("Progress updated");
-                //router.refresh();
+                router.refresh();
             } else {
                 throw new Error(result.error);
             }

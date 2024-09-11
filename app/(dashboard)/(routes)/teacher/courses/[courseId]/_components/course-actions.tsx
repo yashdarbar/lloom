@@ -72,10 +72,10 @@ const CourseActions = ({
             const course = await courseDelete(courseId);
             if (course.success) {
                 toast.success("Course deleted");
+                router.push(`/teacher/courses`);
             } else {
                 toast.error(course?.error || "Chapter is not deleted");
             }
-            //router.push(`/teacher/courses/${courseId}`);
         } catch {
             toast.error("Something went wrong");
         } finally {
